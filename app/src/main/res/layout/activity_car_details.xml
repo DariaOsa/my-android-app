@@ -1,66 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:paddingTop="72dp">
 
+        <!-- 🚗 Car Image -->
         <ImageView
             android:id="@+id/imgCar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
             android:scaleType="centerCrop"
-            android:src="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray"
+            android:contentDescription="@string/car_image" />
 
+        <!-- 🚘 Car Name -->
         <TextView
             android:id="@+id/tvCarName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Car Name"
+            android:text="@string/car_name"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="16dp" />
 
+        <!-- 💰 Price -->
         <TextView
             android:id="@+id/tvCarPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="€50/day"
+            android:text="@string/car_price"
             android:textSize="20sp"
+            android:textStyle="bold"
             android:textColor="#4CAF50"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="6dp" />
 
+        <!-- 📝 Description -->
         <TextView
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Description here"
+            android:text="@string/car_description"
+            android:textSize="14sp"
             android:layout_marginTop="12dp" />
 
+        <!-- ⚙️ Features Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Features"
+            android:text="@string/features"
             android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:textSize="16sp"
+            android:layout_marginTop="20dp" />
 
+        <!-- ⚙️ Features Details -->
         <TextView
             android:id="@+id/tvFeatureDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seats: 5\nFuel: Petrol\nTransmission: Automatic"
+            android:text="@string/features_details"
             android:layout_marginTop="8dp" />
 
+        <!-- 🔥 Book Button -->
         <Button
             android:id="@+id/btnBook"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Book Now"
-            android:layout_marginTop="20dp"
+            android:text="@string/book_now"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"
             android:backgroundTint="#4CAF50"
             android:textColor="@android:color/white" />
 

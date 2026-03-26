@@ -1,8 +1,94 @@
 <resources>
+
+    <!-- App -->
     <string name="app_name">CarSharingApp</string>
+
+    <!-- Welcome -->
+    <string name="find_car">Find a Car</string>
+    <string name="or">or</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
+
+    <!-- Login -->
+    <string name="login_title">Login</string>
+    <string name="login_button">LOGIN</string>
+
+    <!-- Register -->
+    <string name="register_title">Register</string>
+    <string name="register_button">REGISTER</string>
+
+    <!-- Form Fields -->
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="full_name">Full Name</string>
+    <string name="confirm_password">Confirm Password</string>
+
+    <!-- Validation / Errors -->
+    <string name="error_name_required">Name is required</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_invalid_email">Enter a valid email</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_no_account">No account found. Please register first.</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+
+    <!-- Success Messages -->
+    <string name="login_success">Login successful!</string>
+    <string name="register_success">Registered successfully!</string>
+
+    <!-- Map -->
+    <string name="view_list">View List</string>
+    <string name="lang_english">English</string>
+    <string name="lang_greek">Greek</string>
+
+    <!-- Car List -->
+    <string name="car_list">Car list</string>
+
+    <!-- Cars -->
+    <string name="car1_name">Car 1</string>
+    <string name="car1_price">€20/day</string>
+    <string name="car1_desc">Comfortable city car</string>
+
+    <string name="car2_name">Car 2</string>
+    <string name="car2_price">€25/day</string>
+    <string name="car2_desc">Efficient and smooth ride</string>
+
+    <string name="car3_name">Car 3</string>
+    <string name="car3_price">€30/day</string>
+    <string name="car3_desc">Luxury experience vehicle</string>
+
+    <!-- Car Attributes -->
+    <string name="fuel_petrol">Petrol</string>
+    <string name="fuel_diesel">Diesel</string>
+    <string name="transmission_auto">Automatic</string>
+    <string name="transmission_manual">Manual</string>
+
+    <!-- Car Details -->
+    <string name="car_name">Car Name</string>
+    <string name="car_price">€50/day</string>
+    <string name="car_description">Description here</string>
+    <string name="features">Features</string>
+    <string name="features_details">Seats: 5\nFuel: Petrol\nTransmission: Automatic</string>
+
+    <string name="seats">Seats</string>
+    <string name="fuel">Fuel</string>
+    <string name="transmission">Transmission</string>
+
+    <!-- Defaults -->
+    <string name="unknown_car">Unknown Car</string>
+    <string name="default_price">€0/day</string>
+    <string name="default_description">This is a comfortable and reliable car available for sharing.</string>
+
+    <!-- Accessibility -->
+    <string name="car_image">Car image</string>
+
+    <!-- Buttons -->
+    <string name="book_now">Book Now</string>
+    <string name="done">Done</string>
+    <string name="back_to_map">Back to Map</string>
+
+    <!-- Booking -->
+    <string name="booking_success">Booking successful</string>
 
 </resources>

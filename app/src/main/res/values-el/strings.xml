@@ -1,0 +1,94 @@
+<resources>
+
+    <!-- App -->
+    <string name="app_name">CarSharingApp</string>
+
+    <!-- Welcome -->
+    <string name="find_car">Βρες αυτοκίνητο</string>
+    <string name="or">ή</string>
+    <string name="login">Σύνδεση</string>
+    <string name="register">Εγγραφή</string>
+
+    <!-- Login -->
+    <string name="login_title">Σύνδεση</string>
+    <string name="login_button">ΣΥΝΔΕΣΗ</string>
+
+    <!-- Register -->
+    <string name="register_title">Εγγραφή</string>
+    <string name="register_button">ΕΓΓΡΑΦΗ</string>
+
+    <!-- Form Fields -->
+    <string name="email">Email</string>
+    <string name="password">Κωδικός</string>
+    <string name="full_name">Ονοματεπώνυμο</string>
+    <string name="confirm_password">Επιβεβαίωση κωδικού</string>
+
+    <!-- Validation / Errors -->
+    <string name="error_name_required">Το όνομα είναι υποχρεωτικό</string>
+    <string name="error_email_required">Το email είναι υποχρεωτικό</string>
+    <string name="error_invalid_email">Εισάγετε έγκυρο email</string>
+    <string name="error_password_required">Ο κωδικός είναι υποχρεωτικός</string>
+    <string name="error_password_length">Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες</string>
+    <string name="error_password_mismatch">Οι κωδικοί δεν ταιριάζουν</string>
+    <string name="error_no_account">Δεν βρέθηκε λογαριασμός. Παρακαλώ κάντε εγγραφή πρώτα.</string>
+    <string name="error_invalid_credentials">Λάθος email ή κωδικός</string>
+
+    <!-- Success Messages -->
+    <string name="login_success">Επιτυχής σύνδεση!</string>
+    <string name="register_success">Η εγγραφή ολοκληρώθηκε!</string>
+
+    <!-- Map -->
+    <string name="view_list">Λίστα αυτοκινήτων</string>
+    <string name="lang_english">Αγγλικά</string>
+    <string name="lang_greek">Ελληνικά</string>
+
+    <!-- Car List -->
+    <string name="car_list">Λίστα αυτοκινήτων</string>
+
+    <!-- Cars -->
+    <string name="car1_name">Αυτοκίνητο 1</string>
+    <string name="car1_price">20€/ημέρα</string>
+    <string name="car1_desc">Άνετο αυτοκίνητο πόλης</string>
+
+    <string name="car2_name">Αυτοκίνητο 2</string>
+    <string name="car2_price">25€/ημέρα</string>
+    <string name="car2_desc">Αποδοτική και ομαλή οδήγηση</string>
+
+    <string name="car3_name">Αυτοκίνητο 3</string>
+    <string name="car3_price">30€/ημέρα</string>
+    <string name="car3_desc">Πολυτελής εμπειρία οδήγησης</string>
+
+    <!-- Car Attributes -->
+    <string name="fuel_petrol">Βενζίνη</string>
+    <string name="fuel_diesel">Πετρέλαιο</string>
+    <string name="transmission_auto">Αυτόματο</string>
+    <string name="transmission_manual">Χειροκίνητο</string>
+
+    <!-- Car Details -->
+    <string name="car_name">Όνομα αυτοκινήτου</string>
+    <string name="car_price">50€/ημέρα</string>
+    <string name="car_description">Περιγραφή εδώ</string>
+    <string name="features">Χαρακτηριστικά</string>
+    <string name="features_details">Θέσεις: 5\nΚαύσιμο: Βενζίνη\nΚιβώτιο: Αυτόματο</string>
+
+    <string name="seats">Θέσεις</string>
+    <string name="fuel">Καύσιμο</string>
+    <string name="transmission">Κιβώτιο</string>
+
+    <!-- Defaults -->
+    <string name="unknown_car">Άγνωστο αυτοκίνητο</string>
+    <string name="default_price">0€/ημέρα</string>
+    <string name="default_description">Αυτό είναι ένα άνετο και αξιόπιστο αυτοκίνητο διαθέσιμο για κοινή χρήση.</string>
+
+    <!-- Accessibility -->
+    <string name="car_image">Εικόνα αυτοκινήτου</string>
+
+    <!-- Buttons -->
+    <string name="book_now">Κράτηση</string>
+    <string name="done">Ολοκληρώθηκε</string>
+    <string name="back_to_map">Επιστροφή στον χάρτη</string>
+
+    <!-- Booking -->
+    <string name="booking_success">Η κράτηση ολοκληρώθηκε</string>
+
+</resources>

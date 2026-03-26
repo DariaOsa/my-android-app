@@ -1,80 +1,82 @@
 package edu.acg.carsharingapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.adapter.CarAdapter;
 import edu.acg.carsharingapp.model.Car;
-import android.content.Intent;
 
 public class CarListActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private List<Car> carList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
 
-        // Enable back arrow
+        // 🔙 Back arrow
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        // Setup RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.recyclerCars);
+        // 🔧 Setup RecyclerView
+        recyclerView = findViewById(R.id.recyclerCars);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Create sample car data
-        List<Car> carList = new ArrayList<>();
+        // 🚗 Localized car data
+        carList = new ArrayList<>();
 
-        for (int i = 1; i <= 20; i++) {
+        carList.add(new Car(
+                getString(R.string.car1_name),
+                getString(R.string.car1_price),
+                getString(R.string.car1_desc),
+                R.drawable.car1,
+                5,
+                getString(R.string.fuel_petrol),
+                getString(R.string.transmission_auto)
+        ));
 
-            String name = "Car " + i;
-            String price = "€" + (10 + i) + "/day";
-            String description = "This is a comfortable and reliable car number " + i;
+        carList.add(new Car(
+                getString(R.string.car2_name),
+                getString(R.string.car2_price),
+                getString(R.string.car2_desc),
+                R.drawable.car2,
+                5,
+                getString(R.string.fuel_diesel),
+                getString(R.string.transmission_manual)
+        ));
 
-            int[] images = {
-                    R.drawable.car1,
-                    R.drawable.car2,
-                    R.drawable.car3,
-                    R.drawable.car4,
-                    R.drawable.car5
-            };
+        carList.add(new Car(
+                getString(R.string.car3_name),
+                getString(R.string.car3_price),
+                getString(R.string.car3_desc),
+                R.drawable.car3,
+                5,
+                getString(R.string.fuel_petrol),
+                getString(R.string.transmission_auto)
+        ));
 
-            int image = images[i % images.length];
-
-            int seats = 5;
-            String fuelType = "Petrol";
-            String transmission = "Automatic";
-
-            carList.add(new Car(
-                    name,
-                    price,
-                    description,
-                    image,
-                    seats,
-                    fuelType,
-                    transmission
-            ));
-        }
-
-        // Set adapter WITH click listener
+        // 🔥 Adapter with click → Details
         CarAdapter adapter = new CarAdapter(carList, car -> {
             Intent intent = new Intent(CarListActivity.this, CarDetailsActivity.class);
-            intent.putExtra("car", car); // ✅ no cast needed
+            intent.putExtra("car", car);
             startActivity(intent);
         });
 
         recyclerView.setAdapter(adapter);
     }
 
+    // 🔙 Back button
     @Override
     public boolean onSupportNavigateUp() {
         finish();

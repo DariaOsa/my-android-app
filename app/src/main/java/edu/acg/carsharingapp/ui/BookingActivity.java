@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import edu.acg.carsharingapp.R;
 
-public class BookingActivity extends AppCompatActivity {
+public class BookingActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +28,21 @@ public class BookingActivity extends AppCompatActivity {
         String price = getIntent().getStringExtra("price");
 
         // 📝 Set message (localized)
-        String message = getString(R.string.booking_success) + "\n\n" +
-                (carName != null ? carName : getString(R.string.car_name)) + "\n" +
-                (price != null ? price : "");
+        String message = getString(
+                R.string.booking_message,
+                getString(R.string.booking_success),
+                (carName != null ? carName : getString(R.string.unknown_car)),
+                (price != null ? price : getString(R.string.price_per_day, getString(R.string.default_price_value)))
+        );
 
         tvMessage.setText(message);
 
-        // 🔥 DONE → go back to MAP (localized)
-        btnDone.setText(getString(R.string.back_to_map));
+        // 🔥 DONE → go back to MAP
+        btnDone.setText(R.string.back_to_map);
 
         btnDone.setOnClickListener(v -> {
             Intent intent = new Intent(BookingActivity.this, MapActivity.class);
-
-            // Clear back stack (no return to booking)
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-
             startActivity(intent);
             finish();
         });

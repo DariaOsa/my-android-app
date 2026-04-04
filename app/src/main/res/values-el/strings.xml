@@ -11,11 +11,11 @@
 
     <!-- Login -->
     <string name="login_title">Σύνδεση</string>
-    <string name="login_button">ΣΥΝΔΕΣΗ</string>
+    <string name="login_button">Σύνδεση</string>
 
     <!-- Register -->
     <string name="register_title">Εγγραφή</string>
-    <string name="register_button">ΕΓΓΡΑΦΗ</string>
+    <string name="register_button">Εγγραφή</string>
 
     <!-- Form Fields -->
     <string name="email">Email</string>
@@ -30,15 +30,15 @@
     <string name="error_password_required">Ο κωδικός είναι υποχρεωτικός</string>
     <string name="error_password_length">Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες</string>
     <string name="error_password_mismatch">Οι κωδικοί δεν ταιριάζουν</string>
-    <string name="error_no_account">Δεν βρέθηκε λογαριασμός. Παρακαλώ κάντε εγγραφή πρώτα.</string>
+    <string name="error_no_account">Δεν βρέθηκε λογαριασμός. Κάντε εγγραφή πρώτα.</string>
     <string name="error_invalid_credentials">Λάθος email ή κωδικός</string>
 
     <!-- Success Messages -->
     <string name="login_success">Επιτυχής σύνδεση!</string>
-    <string name="register_success">Η εγγραφή ολοκληρώθηκε!</string>
+    <string name="register_success">Επιτυχής εγγραφή!</string>
 
     <!-- Map -->
-    <string name="view_list">Λίστα αυτοκινήτων</string>
+    <string name="view_list">Προβολή λίστας</string>
     <string name="lang_english">Αγγλικά</string>
     <string name="lang_greek">Ελληνικά</string>
 
@@ -47,16 +47,20 @@
 
     <!-- Cars -->
     <string name="car1_name">Αυτοκίνητο 1</string>
-    <string name="car1_price">20€/ημέρα</string>
+    <string name="car1_price_value">20€</string>
     <string name="car1_desc">Άνετο αυτοκίνητο πόλης</string>
 
     <string name="car2_name">Αυτοκίνητο 2</string>
-    <string name="car2_price">25€/ημέρα</string>
+    <string name="car2_price_value">25€</string>
     <string name="car2_desc">Αποδοτική και ομαλή οδήγηση</string>
 
     <string name="car3_name">Αυτοκίνητο 3</string>
-    <string name="car3_price">30€/ημέρα</string>
+    <string name="car3_price_value">30€</string>
     <string name="car3_desc">Πολυτελής εμπειρία οδήγησης</string>
+
+    <!-- Price formatting -->
+    <string name="price_per_day">%1$s ανά ημέρα</string>
+    <string name="default_price_value">0€</string>
 
     <!-- Car Attributes -->
     <string name="fuel_petrol">Βενζίνη</string>
@@ -66,10 +70,13 @@
 
     <!-- Car Details -->
     <string name="car_name">Όνομα αυτοκινήτου</string>
-    <string name="car_price">50€/ημέρα</string>
-    <string name="car_description">Περιγραφή εδώ</string>
+    <string name="car_description">Περιγραφή</string>
     <string name="features">Χαρακτηριστικά</string>
-    <string name="features_details">Θέσεις: 5\nΚαύσιμο: Βενζίνη\nΚιβώτιο: Αυτόματο</string>
+
+    <!-- Formatted Features -->
+    <string name="car_features">
+        Θέσεις: %1$d\nΚαύσιμο: %2$s\nΚιβώτιο: %3$s
+    </string>
 
     <string name="seats">Θέσεις</string>
     <string name="fuel">Καύσιμο</string>
@@ -77,18 +84,21 @@
 
     <!-- Defaults -->
     <string name="unknown_car">Άγνωστο αυτοκίνητο</string>
-    <string name="default_price">0€/ημέρα</string>
-    <string name="default_description">Αυτό είναι ένα άνετο και αξιόπιστο αυτοκίνητο διαθέσιμο για κοινή χρήση.</string>
+    <string name="default_description">Αυτό είναι ένα άνετο και αξιόπιστο αυτοκίνητο διαθέσιμο για χρήση.</string>
 
     <!-- Accessibility -->
     <string name="car_image">Εικόνα αυτοκινήτου</string>
 
     <!-- Buttons -->
     <string name="book_now">Κράτηση</string>
-    <string name="done">Ολοκληρώθηκε</string>
+    <string name="done">Ολοκλήρωση</string>
     <string name="back_to_map">Επιστροφή στον χάρτη</string>
 
     <!-- Booking -->
-    <string name="booking_success">Η κράτηση ολοκληρώθηκε</string>
+    <string name="booking_success">Η κράτηση ολοκληρώθηκε επιτυχώς</string>
+
+    <string name="booking_message">
+        %1$s\n\nΑυτοκίνητο: %2$s\nΤιμή: %3$s
+    </string>
 
 </resources>

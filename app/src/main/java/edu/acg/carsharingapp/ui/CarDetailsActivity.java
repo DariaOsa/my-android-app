@@ -6,12 +6,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.model.Car;
 
-public class CarDetailsActivity extends AppCompatActivity {
+public class CarDetailsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +29,25 @@ public class CarDetailsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        // 📦 TRY to get full Car object (from LIST)
+        // 📦 Get Car object (if coming from list)
         Car car = (Car) getIntent().getSerializableExtra("car");
 
         if (car != null) {
             // ✅ FROM LIST
             tvName.setText(car.getName());
-            tvPrice.setText(car.getPrice());
+
+            // ✅ Proper price formatting
+            tvPrice.setText(getString(R.string.price_per_day, car.getPrice()));
+
             tvDescription.setText(car.getDescription());
 
-            String features = getString(R.string.seats) + ": " + car.getSeats() + "\n" +
-                    getString(R.string.fuel) + ": " + car.getFuelType() + "\n" +
-                    getString(R.string.transmission) + ": " + car.getTransmission();
-
+            // ✅ Proper features formatting
+            String features = getString(
+                    R.string.car_features,
+                    car.getSeats(),
+                    car.getFuelType(),
+                    car.getTransmission()
+            );
             tvFeatures.setText(features);
 
             if (car.getImageResId() != 0) {
@@ -51,27 +55,44 @@ public class CarDetailsActivity extends AppCompatActivity {
             }
 
         } else {
-            // ✅ FROM MAP
+            // ✅ FROM MAP (fallback)
             String carName = getIntent().getStringExtra("carName");
             String price = getIntent().getStringExtra("price");
             int imageResId = getIntent().getIntExtra("imageResId", 0);
 
+            // Name
             if (carName != null) {
                 tvName.setText(carName);
             } else {
-                tvName.setText(getString(R.string.unknown_car));
+                tvName.setText(R.string.unknown_car);
             }
 
+            // Price (formatted)
             if (price != null) {
-                tvPrice.setText(price);
+                tvPrice.setText(getString(R.string.price_per_day, price));
             } else {
-                tvPrice.setText(getString(R.string.default_price));
+                tvPrice.setText(
+                        getString(
+                                R.string.price_per_day,
+                                getString(R.string.default_price_value)
+                        )
+                );
             }
 
-            tvDescription.setText(getString(R.string.default_description));
+            // Description
+            tvDescription.setText(R.string.default_description);
 
-            tvFeatures.setText(getString(R.string.features_details));
+            // Features (default values)
+            tvFeatures.setText(
+                    getString(
+                            R.string.car_features,
+                            5,
+                            getString(R.string.fuel_petrol),
+                            getString(R.string.transmission_auto)
+                    )
+            );
 
+            // Image
             if (imageResId != 0) {
                 imgCar.setImageResource(imageResId);
             } else {
@@ -90,6 +111,7 @@ public class CarDetailsActivity extends AppCompatActivity {
         });
     }
 
+    // 🔙 Handle toolbar back button
     @Override
     public boolean onSupportNavigateUp() {
         finish();

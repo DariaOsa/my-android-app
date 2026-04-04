@@ -3,7 +3,6 @@ package edu.acg.carsharingapp.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,7 +13,7 @@ import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.adapter.CarAdapter;
 import edu.acg.carsharingapp.model.Car;
 
-public class CarListActivity extends AppCompatActivity {
+public class CarListActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
     private List<Car> carList;
@@ -38,7 +37,7 @@ public class CarListActivity extends AppCompatActivity {
 
         carList.add(new Car(
                 getString(R.string.car1_name),
-                getString(R.string.car1_price),
+                getString(R.string.car1_price_value),
                 getString(R.string.car1_desc),
                 R.drawable.car1,
                 5,
@@ -48,7 +47,7 @@ public class CarListActivity extends AppCompatActivity {
 
         carList.add(new Car(
                 getString(R.string.car2_name),
-                getString(R.string.car2_price),
+                getString(R.string.car2_price_value),
                 getString(R.string.car2_desc),
                 R.drawable.car2,
                 5,
@@ -58,7 +57,7 @@ public class CarListActivity extends AppCompatActivity {
 
         carList.add(new Car(
                 getString(R.string.car3_name),
-                getString(R.string.car3_price),
+                getString(R.string.car3_price_value),
                 getString(R.string.car3_desc),
                 R.drawable.car3,
                 5,

@@ -1,26 +1,18 @@
 package edu.acg.carsharingapp.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 
 import edu.acg.carsharingapp.R;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.loadLocale(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +27,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         btnViewList.setOnClickListener(v ->
                 startActivity(new Intent(MapActivity.this, CarListActivity.class))
         );
-
-        ImageView imgEnglish = findViewById(R.id.imgEnglish);
-        ImageView imgGreek = findViewById(R.id.imgGreek);
-
-        imgEnglish.setOnClickListener(v -> setLanguage("en"));
-        imgGreek.setOnClickListener(v -> setLanguage("el"));
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager()
@@ -62,19 +48,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Marker car1Marker = mMap.addMarker(new MarkerOptions()
                 .position(car1)
                 .title(getString(R.string.car1_name))
-                .snippet(getString(R.string.car1_price)));
+                .snippet(getString(R.string.price_per_day, getString(R.string.car1_price_value))));
         car1Marker.setTag(R.drawable.car1);
 
         Marker car2Marker = mMap.addMarker(new MarkerOptions()
                 .position(car2)
                 .title(getString(R.string.car2_name))
-                .snippet(getString(R.string.car2_price)));
+                .snippet(getString(R.string.price_per_day, getString(R.string.car2_price_value))));
         car2Marker.setTag(R.drawable.car2);
 
         Marker car3Marker = mMap.addMarker(new MarkerOptions()
                 .position(car3)
                 .title(getString(R.string.car3_name))
-                .snippet(getString(R.string.car3_price)));
+                .snippet(getString(R.string.price_per_day, getString(R.string.car3_price_value))));
         car3Marker.setTag(R.drawable.car3);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(car1, 13));
@@ -92,16 +78,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return false;
         });
     }
-
-    private void setLanguage(String lang) {
-        LocaleHelper.setLocale(this, lang);
-
-        // Restart activity properly
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-    }
-
     @Override
     public boolean onSupportNavigateUp() {
         finish();

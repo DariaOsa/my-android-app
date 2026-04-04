@@ -1,22 +1,15 @@
 package edu.acg.carsharingapp.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.ImageView;
 
 import edu.acg.carsharingapp.R;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class WelcomeActivity extends BaseActivity {
 
     private Button btnFindCar, btnLogin, btnRegister;
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.loadLocale(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,5 +34,17 @@ public class WelcomeActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(v ->
                 startActivity(new Intent(WelcomeActivity.this, RegisterActivity.class))
         );
+
+        // 🌍 Language switch
+        ImageView imgEnglish = findViewById(R.id.imgEnglish);
+        ImageView imgGreek = findViewById(R.id.imgGreek);
+
+        imgEnglish.setOnClickListener(v -> setLanguage("en"));
+        imgGreek.setOnClickListener(v -> setLanguage("el"));
+    }
+
+    private void setLanguage(String lang) {
+        LocaleHelper.setLocale(this, lang);
+        recreate();
     }
 }

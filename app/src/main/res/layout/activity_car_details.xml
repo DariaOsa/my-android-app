@@ -37,7 +37,7 @@
             android:id="@+id/tvCarPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/car_price"
+            android:text=""
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#4CAF50"
@@ -66,7 +66,7 @@
             android:id="@+id/tvFeatureDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/features_details"
+            android:text=""
             android:layout_marginTop="8dp" />
 
         <!-- 🔥 Book Button -->

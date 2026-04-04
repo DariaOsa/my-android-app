@@ -34,9 +34,9 @@
     <Button
         android:id="@+id/btnLoginSubmit"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="@string/login_button"
+        android:layout_height="wrap_content"
         android:backgroundTint="#000000"
-        android:textColor="#FFFFFF"/>
+        android:text="@string/login_button"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>

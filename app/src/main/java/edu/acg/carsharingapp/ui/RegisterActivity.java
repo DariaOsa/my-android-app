@@ -1,25 +1,19 @@
 package edu.acg.carsharingapp.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import edu.acg.carsharingapp.R;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
+
+    private static final String PREFS_NAME = "UserPrefs";
 
     private EditText etName, etEmail, etPassword, etConfirmPassword;
     private Button btnRegister;
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.loadLocale(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,14 +82,14 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // 💾 Save user data
-        getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .edit()
                 .putString("email", email)
                 .putString("password", password)
                 .apply();
 
         // ✅ Success
-        Toast.makeText(this, getString(R.string.register_success), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.register_success, Toast.LENGTH_SHORT).show();
 
         // Close and go back to login
         finish();

@@ -11,11 +11,11 @@
 
     <!-- Login -->
     <string name="login_title">Login</string>
-    <string name="login_button">LOGIN</string>
+    <string name="login_button">Login</string>
 
     <!-- Register -->
     <string name="register_title">Register</string>
-    <string name="register_button">REGISTER</string>
+    <string name="register_button">Register</string>
 
     <!-- Form Fields -->
     <string name="email">Email</string>
@@ -43,20 +43,24 @@
     <string name="lang_greek">Greek</string>
 
     <!-- Car List -->
-    <string name="car_list">Car list</string>
+    <string name="car_list">Car List</string>
 
     <!-- Cars -->
     <string name="car1_name">Car 1</string>
-    <string name="car1_price">€20/day</string>
+    <string name="car1_price_value">€20</string>
     <string name="car1_desc">Comfortable city car</string>
 
     <string name="car2_name">Car 2</string>
-    <string name="car2_price">€25/day</string>
+    <string name="car2_price_value">€25</string>
     <string name="car2_desc">Efficient and smooth ride</string>
 
     <string name="car3_name">Car 3</string>
-    <string name="car3_price">€30/day</string>
+    <string name="car3_price_value">€30</string>
     <string name="car3_desc">Luxury experience vehicle</string>
+
+    <!-- Price formatting -->
+    <string name="price_per_day">%1$s/day</string>
+    <string name="default_price_value">€0</string>
 
     <!-- Car Attributes -->
     <string name="fuel_petrol">Petrol</string>
@@ -66,10 +70,13 @@
 
     <!-- Car Details -->
     <string name="car_name">Car Name</string>
-    <string name="car_price">€50/day</string>
     <string name="car_description">Description here</string>
     <string name="features">Features</string>
-    <string name="features_details">Seats: 5\nFuel: Petrol\nTransmission: Automatic</string>
+
+    <!-- Formatted Features -->
+    <string name="car_features">
+        Seats: %1$d\nFuel: %2$s\nTransmission: %3$s
+    </string>
 
     <string name="seats">Seats</string>
     <string name="fuel">Fuel</string>
@@ -77,7 +84,6 @@
 
     <!-- Defaults -->
     <string name="unknown_car">Unknown Car</string>
-    <string name="default_price">€0/day</string>
     <string name="default_description">This is a comfortable and reliable car available for sharing.</string>
 
     <!-- Accessibility -->
@@ -89,6 +95,10 @@
     <string name="back_to_map">Back to Map</string>
 
     <!-- Booking -->
-    <string name="booking_success">Booking successful</string>
+    <string name="booking_success">Booking completed successfully</string>
+
+    <string name="booking_message">
+        %1$s\n\nCar: %2$s\nPrice: %3$s
+    </string>
 
 </resources>

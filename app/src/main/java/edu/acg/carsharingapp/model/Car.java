@@ -1,53 +1,94 @@
 package edu.acg.carsharingapp.model;
 
-import java.io.Serializable; // ✅ ADD THIS
+import java.io.Serializable;
 
-public class Car implements Serializable { // ✅ ADD THIS
+public class Car implements Serializable {
 
-    private String name;
-    private String price;
-    private String description;
+    private String brand;
+    private String model;
+    private String category;
+    private double pricePerTrip;
+    private float rating;
     private int imageResId;
     private int seats;
     private String fuelType;
     private String transmission;
 
-    public Car(String name, String price, String description,
-               int imageResId, int seats, String fuelType, String transmission) {
-        this.name = name;
-        this.price = price;
-        this.description = description;
+    // 🔥 REQUIRED (Firebase / Serialization)
+    public Car() {}
+
+    public Car(String brand, String model, String category,
+               double pricePerTrip, float rating,
+               int imageResId, int seats,
+               String fuelType, String transmission) {
+
+        this.brand = brand;
+        this.model = model;
+        this.category = category;
+        this.pricePerTrip = pricePerTrip;
+        this.rating = rating;
         this.imageResId = imageResId;
         this.seats = seats;
         this.fuelType = fuelType;
         this.transmission = transmission;
     }
 
-    public String getName() {
-        return name;
+    // =========================
+    // 🎨 DISPLAY HELPERS
+    // =========================
+
+    public String getDisplayName() {
+        return brand + " " + model;
     }
 
-    public String getPrice() {
-        return price;
+    public String getFullName() {
+        return brand + " " + model + " • " + category;
     }
 
-    public String getDescription() {
-        return description;
+    public String getFormattedPrice() {
+        return String.format("€%.2f / trip", pricePerTrip);
     }
 
-    public int getImageResId() {
-        return imageResId;
+    public String getFormattedRating() {
+        return "⭐ " + rating;
     }
 
-    public int getSeats() {
-        return seats;
+    public String getCategoryWithRating() {
+        return category + " • ⭐ " + rating;
     }
 
-    public String getFuelType() {
-        return fuelType;
+    public String getSeatsText() {
+        return seats + " seats";
     }
 
-    public String getTransmission() {
-        return transmission;
+    public String getShortTransmission() {
+        if (transmission == null) return "";
+        return transmission.equalsIgnoreCase("Automatic") ? "Auto" : "Manual";
     }
+
+    public String getFuelDisplay() {
+        return fuelType != null ? fuelType : "Unknown";
+    }
+
+    // =========================
+    // 📥 GETTERS
+    // =========================
+
+    public String getBrand() { return brand; }
+
+    public String getModel() { return model; }
+
+    public String getCategory() { return category; }
+
+    public double getPricePerTrip() { return pricePerTrip; }
+
+    public float getRating() { return rating; }
+
+    public int getImageResId() { return imageResId; }
+
+    public int getSeats() { return seats; }
+
+    public String getFuelType() { return fuelType; }
+
+    public String getTransmission() { return transmission; }
 }

@@ -1,257 +1,346 @@
 package edu.acg.carsharingapp.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.*;
 
 import java.util.HashMap;
 
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.model.Trip;
+import edu.acg.carsharingapp.model.Car;
+import edu.acg.carsharingapp.data.CarRepository;
 
 public class BookingActivity extends BaseActivity {
 
-    private TextView txtInfo;
-    private Button btnAction;
-    private Button btnBack;
+    // 🔤 TEXT VIEWS
+    private TextView txtCar, txtSeats, txtStatus;
+    private TextView txtRoute, txtTime, txtPrice;
+    private TextView txtFuel, txtTransmission, txtCategory;
 
-    private DatabaseReference tripsRef;
+    // 🔘 UI
+    private MaterialButton btnJoin;
+    private ImageView imgCar;
 
+    // 🔥 DATA
+    private DatabaseReference tripRef;
     private String tripId;
     private String userId;
     private String role;
+
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        txtInfo = findViewById(R.id.txtInfo);
-        btnAction = findViewById(R.id.btnJoin);
-        btnBack = findViewById(R.id.btnBack);
+        setupToolbar();
+        initViews();
+        loadSession();
 
-        tripId = getIntent().getStringExtra("tripId");
+        // =========================
+        // 🚗 FLOW 1: FROM CAR LIST
+        // =========================
+        Car car = (Car) getIntent().getSerializableExtra("car");
 
-        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-        userId = prefs.getString("userId", null);
-        role = prefs.getString("role", "PASSENGER");
-
-        tripsRef = FirebaseDatabase.getInstance().getReference("trips");
-
-        if (tripId == null) {
-            txtInfo.setText("Trip ID missing");
+        if (car != null) {
+            showCarPreview(car);
             return;
         }
 
-        loadTrip();
+        // =========================
+        // 🚗 FLOW 2: FROM MAP
+        // =========================
+        tripId = getIntent().getStringExtra("tripId");
 
-        btnBack.setOnClickListener(v -> finish());
+        if (tripId == null || userId == null) {
+            Toast.makeText(this, "Error loading trip", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        tripRef = FirebaseDatabase.getInstance()
+                .getReference("trips")
+                .child(tripId);
+
+        loadTrip();
     }
+
+    // =========================
+    // 🔧 SETUP METHODS
+    // =========================
+
+    private void setupToolbar() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("CarSharingApp");
+        }
+    }
+
+    private void initViews() {
+        txtCar = findViewById(R.id.txtCar);
+        txtSeats = findViewById(R.id.txtSeats);
+        txtStatus = findViewById(R.id.txtStatus);
+        txtRoute = findViewById(R.id.txtRoute);
+        txtTime = findViewById(R.id.txtTime);
+        txtPrice = findViewById(R.id.txtPrice);
+
+        txtFuel = findViewById(R.id.txtFuel);
+        txtTransmission = findViewById(R.id.txtTransmission);
+        txtCategory = findViewById(R.id.txtCategory);
+
+        btnJoin = findViewById(R.id.btnJoin);
+        imgCar = findViewById(R.id.imgCar);
+    }
+
+    private void loadSession() {
+        prefs = getSharedPreferences("session", MODE_PRIVATE);
+        userId = prefs.getString("userId", null);
+        role = prefs.getString("role", "PASSENGER");
+    }
+
+    // =========================
+    // 🚗 CAR PREVIEW MODE
+    // =========================
+
+    private void showCarPreview(Car car) {
+        bindCarUI(car);
+
+        txtSeats.setText(car.getSeats() + " seats");
+        txtPrice.setText(car.getFormattedPrice());
+
+        txtRoute.setVisibility(View.GONE);
+        txtTime.setVisibility(View.GONE);
+
+        setStatus("READY", 0xFF4CAF50);
+
+        btnJoin.setText("Start Ride");
+        btnJoin.setOnClickListener(v ->
+                Toast.makeText(this, "Create trip logic later", Toast.LENGTH_SHORT).show()
+        );
+    }
+
+    // =========================
+    // 🔥 LOAD TRIP
+    // =========================
 
     private void loadTrip() {
 
-        tripsRef.child(tripId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        tripRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Trip trip = snapshot.getValue(Trip.class);
+                if (trip == null) return;
 
-                        if (!snapshot.exists()) {
-                            txtInfo.setText("Trip not found");
-                            return;
-                        }
+                Car car = CarRepository.getCarByName(trip.getCarName());
+                bindCarUI(car);
 
-                        Trip trip = snapshot.getValue(Trip.class);
+                txtSeats.setText(trip.getAvailableSeats() + " seats available");
+                txtPrice.setText(trip.getFormattedPrice());
 
-                        if (trip == null || trip.getStatus() == null) {
-                            txtInfo.setText("Error loading trip");
-                            return;
-                        }
+                handleRoleUI(trip);
+            }
 
-                        txtInfo.setText(
-                                "Car: " + trip.getCarName() + "\n" +
-                                        "Seats: " + trip.getAvailableSeats() + "\n" +
-                                        "Status: " + trip.getStatus()
-                        );
-
-                        setupActionButton(trip);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
-    private void setupActionButton(Trip trip) {
+    // =========================
+    // 🎨 UI HELPERS
+    // =========================
 
-        DatabaseReference tripRef = tripsRef.child(tripId);
+    private void bindCarUI(Car car) {
+        if (car != null) {
+            txtCar.setText(car.getDisplayName());
+            txtFuel.setText(car.getFuelType());
+            txtTransmission.setText(car.getTransmission());
+            txtCategory.setText(car.getCategory() + " • ⭐ " + car.getRating());
+            imgCar.setImageResource(car.getImageResId());
+        } else {
+            txtCar.setText("Unknown Car");
+            imgCar.setImageResource(R.drawable.car1);
+        }
+    }
+
+    private void setStatus(String text, int color) {
+        txtStatus.setText(text);
+        txtStatus.setTextColor(color);
+    }
+
+    // =========================
+    // 👤 ROLE HANDLING
+    // =========================
+
+    private void handleRoleUI(Trip trip) {
 
         boolean isDriver = "DRIVER".equals(role);
-        boolean isMine = userId.equals(trip.getDriverId());
 
-        boolean joined =
-                trip.getPassengers() != null &&
-                        trip.getPassengers().containsKey(userId);
-
-        boolean hasSeats = trip.hasAvailableSeats();
-
-        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-        String activeTrip = prefs.getString("activeTripId", null);
-
-        // ================= DRIVER =================
         if (isDriver) {
+            handleDriverUI(trip);
+        } else {
+            handlePassengerUI(trip);
+        }
+    }
 
-            // 🔥 START RIDE
-            if (trip.isAvailable() || (trip.isBooked() && isMine)) {
+    // =========================
+    // 🚗 DRIVER MODE
+    // =========================
 
-                btnAction.setText("Start Ride");
+    private void handleDriverUI(Trip trip) {
 
-                btnAction.setOnClickListener(v -> {
+        txtRoute.setVisibility(View.GONE);
+        txtTime.setVisibility(View.GONE);
 
-                    if (activeTrip != null && !activeTrip.equals(tripId)) {
-                        Toast.makeText(this, "Finish your current ride first", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        btnJoin.setVisibility(View.VISIBLE);
 
-                    tripRef.child("driverId").setValue(userId);
-                    tripRef.child("status").setValue(Trip.STATUS_IN_PROGRESS);
+        if (trip.isAvailable()) {
 
-                    prefs.edit().putString("activeTripId", tripId).apply();
+            setStatus("READY", 0xFF4CAF50);
+            btnJoin.setText("Start Ride");
 
-                    Toast.makeText(this, "Ride started", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-            }
+            btnJoin.setOnClickListener(v -> {
 
-            // 🔥 END RIDE
-            else if (trip.isInProgress() && isMine) {
+                prefs.edit()
+                        .putString("activeTripId", tripId)
+                        .putBoolean("pickingDestination", true)
+                        .apply();
 
-                btnAction.setText("End Ride");
+                Toast.makeText(this, "Select destination on map", Toast.LENGTH_SHORT).show();
 
-                btnAction.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            });
 
-                    tripRef.child("status").setValue(Trip.STATUS_AVAILABLE);
-                    tripRef.child("driverId").setValue(null);
-                    tripRef.child("passengers").setValue(null);
+        } else {
+            btnJoin.setVisibility(View.GONE);
+        }
+    }
 
-                    // 🔥 FIX: reset seats
-                    tripRef.child("availableSeats").setValue(3);
+    // =========================
+    // 🧍 PASSENGER MODE
+    // =========================
 
-                    prefs.edit().remove("activeTripId").apply();
+    private void handlePassengerUI(Trip trip) {
 
-                    Toast.makeText(this, "Ride ended", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-            }
+        txtRoute.setVisibility(View.VISIBLE);
+        txtTime.setVisibility(View.VISIBLE);
 
-            else {
-                btnAction.setText("Not Available");
-                btnAction.setEnabled(false);
-            }
+        txtRoute.setText("📍 " + trip.getRoute());
+        txtTime.setText("⏰ " + trip.getDepartureTime());
 
+        if (!trip.isInProgress()) {
+            btnJoin.setVisibility(View.GONE);
             return;
         }
 
-        // ================= PASSENGER =================
+        btnJoin.setVisibility(View.VISIBLE);
 
-        if (!joined && trip.isInProgress() && hasSeats) {
+        boolean alreadyJoined = trip.hasPassenger(userId);
 
-            btnAction.setText("Join");
-
-            btnAction.setOnClickListener(v -> {
-
-                if (activeTrip != null && !activeTrip.equals(tripId)) {
-                    Toast.makeText(this, "Leave current trip first", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                tripRef.runTransaction(new Transaction.Handler() {
-
-                    @NonNull
-                    @Override
-                    public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-
-                        Trip t = currentData.getValue(Trip.class);
-                        if (t == null) return Transaction.success(currentData);
-
-                        if (!t.hasAvailableSeats()) {
-                            return Transaction.abort();
-                        }
-
-                        t.setAvailableSeats(t.getAvailableSeats() - 1);
-
-                        if (t.getPassengers() == null) {
-                            t.setPassengers(new HashMap<>());
-                        }
-
-                        t.getPassengers().put(userId, true);
-
-                        currentData.setValue(t);
-                        return Transaction.success(currentData);
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError error, boolean committed, DataSnapshot snapshot) {
-
-                        if (committed) {
-                            prefs.edit().putString("activeTripId", tripId).apply();
-                            Toast.makeText(BookingActivity.this, "Joined trip", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(BookingActivity.this, "Trip full", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            });
-        }
-
-        else if (joined) {
-
-            btnAction.setText("Leave");
-
-            btnAction.setOnClickListener(v -> {
-
-                tripRef.runTransaction(new Transaction.Handler() {
-
-                    @NonNull
-                    @Override
-                    public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-
-                        Trip t = currentData.getValue(Trip.class);
-                        if (t == null) return Transaction.success(currentData);
-
-                        if (t.getPassengers() != null) {
-                            t.getPassengers().remove(userId);
-                            t.setAvailableSeats(t.getAvailableSeats() + 1);
-                        }
-
-                        currentData.setValue(t);
-                        return Transaction.success(currentData);
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError error, boolean committed, DataSnapshot snapshot) {
-
-                        if (committed) {
-                            prefs.edit().remove("activeTripId").apply();
-                            Toast.makeText(BookingActivity.this, "Left trip", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-                });
-            });
-        }
-
-        else {
-            btnAction.setText("Not Available");
-            btnAction.setEnabled(false);
+        if (alreadyJoined) {
+            setupLeaveRide(trip);
+        } else {
+            setupJoinRide(trip);
         }
     }
-}
 
+    private void setupLeaveRide(Trip trip) {
+
+        btnJoin.setText("Leave Ride");
+
+        btnJoin.setOnClickListener(v -> {
+
+            trip.getPassengers().remove(userId);
+            trip.setAvailableSeats(trip.getAvailableSeats() + 1);
+
+            tripRef.setValue(trip);
+
+            prefs.edit().remove("activeTripId").apply();
+
+            Toast.makeText(this, "Left ride", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupJoinRide(Trip trip) {
+
+        if (!trip.hasAvailableSeats()) {
+            btnJoin.setText("Full");
+            btnJoin.setEnabled(false);
+            return;
+        }
+
+        btnJoin.setEnabled(true);
+        btnJoin.setText("Join Ride");
+
+        btnJoin.setOnClickListener(v -> {
+
+            tripRef.runTransaction(new Transaction.Handler() {
+                @NonNull
+                @Override
+                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+
+                    Trip t = currentData.getValue(Trip.class);
+                    if (t == null) return Transaction.success(currentData);
+
+                    if (!t.hasAvailableSeats()) {
+                        return Transaction.abort();
+                    }
+
+                    t.setAvailableSeats(t.getAvailableSeats() - 1);
+
+                    if (t.getPassengers() == null) {
+                        t.setPassengers(new HashMap<>());
+                    }
+
+                    t.getPassengers().put(userId, true);
+
+                    currentData.setValue(t);
+                    return Transaction.success(currentData);
+                }
+
+                @Override
+                public void onComplete(DatabaseError error,
+                                       boolean committed,
+                                       DataSnapshot snapshot) {
+
+                    if (committed) {
+                        prefs.edit()
+                                .putString("activeTripId", tripId)
+                                .apply();
+
+                        Toast.makeText(BookingActivity.this,
+                                "Joined ride!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        });
+    }
+
+    // =========================
+    // 🔙 BACK BUTTON
+    // =========================
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}

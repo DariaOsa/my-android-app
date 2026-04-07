@@ -19,5 +19,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="" />
+    <ImageView
+        android:id="@+id/imgCar"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/tvCarDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#777"/>
 
 </LinearLayout>

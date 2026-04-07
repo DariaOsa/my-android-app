@@ -1,71 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="#F5F5F5">
+    android:background="#F5F7FA">
 
-    <!-- 🧾 TITLE -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Trip Status"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        android:layout_marginBottom="16dp" />
-
-    <!-- 📦 CARD -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+    <!-- 🚗 IMAGE (clean + tighter) -->
+    <ImageView
+        android:id="@+id/imgCar"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:layout_margin="16dp"
+        android:scaleType="centerCrop"
         android:background="#FFFFFF"
-        android:padding="20dp"
-        android:elevation="4dp">
+        android:clipToOutline="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/car1"/>
 
-        <!-- 📝 INFO TEXT -->
-        <TextView
-            android:id="@+id/txtInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Loading..."
-            android:textSize="18sp"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp" />
-
-    </LinearLayout>
-
-    <!-- 🔵 JOIN BUTTON -->
-    <Button
-        android:id="@+id/btnJoin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Join Trip"
-        android:padding="16dp"
-        android:textSize="16sp"
-        android:backgroundTint="#2196F3"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="16dp" />
-
-    <!-- 🔽 SPACE -->
-    <View
-        android:layout_width="match_parent"
+    <!-- 🚗 MAIN CARD -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mainCard"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/imgCar"
+        app:layout_constraintBottom_toTopOf="@id/btnJoin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- 🔘 BACK BUTTON -->
-    <Button
-        android:id="@+id/btnBack"
-        android:layout_width="match_parent"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- 🚗 TITLE -->
+                <TextView
+                    android:id="@+id/txtCar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Audi A4"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#111"/>
+
+                <!-- ⭐ CATEGORY -->
+                <TextView
+                    android:id="@+id/txtCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Comfort • ⭐ 4.5"
+                    android:textSize="14sp"
+                    android:textColor="#666"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- 📊 INFO -->
+                <TextView
+                    android:id="@+id/txtSeats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👥 5 seats available"
+                    android:textColor="#444"
+                    android:textSize="14sp"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/txtFuel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⛽ Petrol"
+                    android:textColor="#444"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/txtTransmission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️ Automatic"
+                    android:textColor="#444"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- 📍 ROUTE -->
+                <TextView
+                    android:id="@+id/txtRoute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍 Route"
+                    android:textSize="14sp"
+                    android:textColor="#555"
+                    android:layout_marginTop="16dp"/>
+
+                <!-- ⏰ TIME -->
+                <TextView
+                    android:id="@+id/txtTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏰ Time"
+                    android:textSize="13sp"
+                    android:textColor="#777"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- 💰 PRICE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Price"
+                    android:textColor="#888"
+                    android:textSize="12sp"
+                    android:layout_marginTop="20dp"/>
+
+                <TextView
+                    android:id="@+id/txtPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="€11.00 / trip"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#111"
+                    android:layout_marginTop="2dp"/>
+
+                <!-- 🟢 STATUS -->
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="READY"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="#2ECC71"
+                    android:layout_marginTop="12dp"/>
+
+                <!-- spacing -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 🔘 BUTTON -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnJoin"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Back to Map"
+        android:layout_margin="16dp"
+        android:text="Start Ride"
+        android:textAllCaps="false"
+        android:textSize="17sp"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="28dp"
+        app:backgroundTint="#111111"
+        android:elevation="6dp"
         android:padding="16dp"
-        android:textSize="16sp"
-        android:backgroundTint="#4CAF50"
-        android:textColor="#FFFFFF" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

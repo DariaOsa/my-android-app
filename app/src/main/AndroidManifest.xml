@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- 🌐 Internet permission (required for Maps) -->
     <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,16 +14,12 @@
         android:theme="@style/Theme.CarSharingApp">
         <activity
             android:name=".ui.BookingActivity"
-            android:exported="false" />
-        <!-- 🔑 Google Maps API KEY (VERY IMPORTANT) -->
+            android:exported="false" /> <!-- 🔑 Google Maps API KEY (VERY IMPORTANT) -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA5JZ3w_M9F62uOy02zE4VM_GkdnItO1es" /> <!-- Activities -->
         <activity
             android:name=".ui.MapActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.CarDetailsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.CarListActivity"

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,24 +18,28 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
     private List<Car> carList;
     private OnItemClickListener listener;
 
-    // 🔥 Interface for click handling
+    // 🔥 Click interface
     public interface OnItemClickListener {
         void onItemClick(Car car);
     }
 
-    // 🔥 Updated constructor
     public CarAdapter(List<Car> carList, OnItemClickListener listener) {
         this.carList = carList;
         this.listener = listener;
     }
 
     public static class CarViewHolder extends RecyclerView.ViewHolder {
-        TextView name, price;
+
+        TextView name, price, details;
+        ImageView image;
 
         public CarViewHolder(View itemView) {
             super(itemView);
+
             name = itemView.findViewById(R.id.tvCarName);
             price = itemView.findViewById(R.id.tvCarPrice);
+            details = itemView.findViewById(R.id.tvCarDetails); // optional (add in XML)
+            image = itemView.findViewById(R.id.imgCar); // optional (add in XML)
         }
     }
 
@@ -47,14 +52,30 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
 
     @Override
     public void onBindViewHolder(CarViewHolder holder, int position) {
+
         Car car = carList.get(position);
 
-        holder.name.setText(car.getName());
-        holder.price.setText(car.getPrice());
+        // 🔥 NEW DATA USAGE
+        holder.name.setText(car.getDisplayName());
+        holder.price.setText(car.getFormattedPrice());
 
-        // 🔥 CLICK LISTENER (IMPORTANT PART)
+        // OPTIONAL polish (if you add TextView in XML)
+        if (holder.details != null) {
+            holder.details.setText(
+                    car.getFuelType() + " • " + car.getTransmission()
+            );
+        }
+
+        // OPTIONAL image (if you add ImageView in XML)
+        if (holder.image != null) {
+            holder.image.setImageResource(car.getImageResId());
+        }
+
+        // 🔥 Click
         holder.itemView.setOnClickListener(v -> {
-            listener.onItemClick(car);
+            if (listener != null) {
+                listener.onItemClick(car);
+            }
         });
     }
 

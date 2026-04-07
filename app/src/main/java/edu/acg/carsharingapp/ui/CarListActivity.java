@@ -6,11 +6,11 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.adapter.CarAdapter;
+import edu.acg.carsharingapp.data.CarRepository;
 import edu.acg.carsharingapp.model.Car;
 
 public class CarListActivity extends BaseActivity {
@@ -26,49 +26,28 @@ public class CarListActivity extends BaseActivity {
         // 🔙 Back arrow
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Available Cars");
         }
 
-        // 🔧 Setup RecyclerView
+        // 🔧 RecyclerView
         recyclerView = findViewById(R.id.recyclerCars);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // 🚗 Localized car data
-        carList = new ArrayList<>();
+        // 🔥 USE REPOSITORY (no more hardcoding)
+        carList = CarRepository.getCars();
 
-        carList.add(new Car(
-                getString(R.string.car1_name),
-                getString(R.string.car1_price_value),
-                getString(R.string.car1_desc),
-                R.drawable.car1,
-                5,
-                getString(R.string.fuel_petrol),
-                getString(R.string.transmission_auto)
-        ));
-
-        carList.add(new Car(
-                getString(R.string.car2_name),
-                getString(R.string.car2_price_value),
-                getString(R.string.car2_desc),
-                R.drawable.car2,
-                5,
-                getString(R.string.fuel_diesel),
-                getString(R.string.transmission_manual)
-        ));
-
-        carList.add(new Car(
-                getString(R.string.car3_name),
-                getString(R.string.car3_price_value),
-                getString(R.string.car3_desc),
-                R.drawable.car3,
-                5,
-                getString(R.string.fuel_petrol),
-                getString(R.string.transmission_auto)
-        ));
-
-        // 🔥 Adapter with click → Details
+        // 🚗 Adapter → go directly to BookingActivity
         CarAdapter adapter = new CarAdapter(carList, car -> {
-            Intent intent = new Intent(CarListActivity.this, CarDetailsActivity.class);
+
+            Intent intent = new Intent(CarListActivity.this, BookingActivity.class);
+
+            // 🔥 Pass full car object
             intent.putExtra("car", car);
+
+            // Optional (if you want)
+            intent.putExtra("userId", getSharedPreferences("session", MODE_PRIVATE)
+                    .getString("userId", null));
+
             startActivity(intent);
         });
 

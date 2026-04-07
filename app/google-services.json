@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "444009555964",
+    "firebase_url": "https://carsharingapp-206ee-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "carsharingapp-206ee",
+    "storage_bucket": "carsharingapp-206ee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444009555964:android:0d5904c94e218e6124f479",
+        "android_client_info": {
+          "package_name": "edu.acg.carsharingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKiXqqtf9em1D9xfEu9an2LWpugMIHmUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

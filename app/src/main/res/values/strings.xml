@@ -101,4 +101,21 @@
         %1$s\n\nCar: %2$s\nPrice: %3$s
     </string>
 
+    <!-- ===================== -->
+    <!-- Trip / Ride Sharing -->
+    <!-- ===================== -->
+
+    <string name="trip_created">Trip created successfully!</string>
+    <string name="trip_joined">Joined trip!</string>
+    <string name="no_trips">No available trips to join.</string>
+
+    <!-- Trip Info Labels -->
+    <string name="car_label">Car: %1$s</string>
+    <string name="seats_label">Seats: %1$d</string>
+    <string name="seats_left">Seats left: %1$d</string>
+
+    <string name="select_role">Select role</string>
+    <string name="login_driver">Login as Driver</string>
+    <string name="login_passenger">Login as Passenger</string>
+
 </resources>

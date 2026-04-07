@@ -101,4 +101,21 @@
         %1$s\n\nΑυτοκίνητο: %2$s\nΤιμή: %3$s
     </string>
 
+    <!-- ===================== -->
+    <!-- Διαδρομές / Ride Sharing -->
+    <!-- ===================== -->
+
+    <string name="trip_created">Η διαδρομή δημιουργήθηκε επιτυχώς!</string>
+    <string name="trip_joined">Συμμετοχή στη διαδρομή!</string>
+    <string name="no_trips">Δεν υπάρχουν διαθέσιμες διαδρομές.</string>
+
+    <!-- Πληροφορίες διαδρομής -->
+    <string name="car_label">Αυτοκίνητο: %1$s</string>
+    <string name="seats_label">Θέσεις: %1$d</string>
+    <string name="seats_left">Διαθέσιμες θέσεις: %1$d</string>
+
+    <string name="select_role">Επιλέξτε ρόλο</string>
+    <string name="login_driver">Σύνδεση ως οδηγός</string>
+    <string name="login_passenger">Σύνδεση ως επιβάτης</string>
+
 </resources>

@@ -7,36 +7,62 @@
     android:padding="24dp"
     android:background="#F5F5F5">
 
+    <!-- 🔤 Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login_title"
+        android:text="Login"
         android:textSize="26sp"
         android:textStyle="bold"
         android:layout_marginBottom="30dp"/>
 
+    <!-- 📧 Email -->
     <EditText
         android:id="@+id/etEmail"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="@string/email"
+        android:hint="Email"
         android:inputType="textEmailAddress"
         android:layout_marginBottom="15dp"/>
 
+    <!-- 🔒 Password -->
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="@string/password"
+        android:hint="Password"
         android:inputType="textPassword"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="25dp"/>
 
+    <!-- 👤 Role label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login as:"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- 🚗 DRIVER BUTTON -->
     <Button
-        android:id="@+id/btnLoginSubmit"
+        android:id="@+id/btnLoginDriver"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="#000000"
-        android:text="@string/login_button"
-        android:textColor="#FFFFFF" />
+        android:text="Login as Driver"
+        android:layout_marginBottom="10dp"/>
+
+    <!-- 👤 PASSENGER BUTTON -->
+    <Button
+        android:id="@+id/btnLoginPassenger"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login as Passenger"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- 🆕 REGISTER -->
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"/>
 
 </LinearLayout>

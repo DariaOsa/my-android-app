@@ -36,12 +36,10 @@ public class CarDetailsActivity extends BaseActivity {
             // ✅ FROM LIST
             tvName.setText(car.getName());
 
-            // ✅ Proper price formatting
             tvPrice.setText(getString(R.string.price_per_day, car.getPrice()));
 
             tvDescription.setText(car.getDescription());
 
-            // ✅ Proper features formatting
             String features = getString(
                     R.string.car_features,
                     car.getSeats(),
@@ -60,14 +58,12 @@ public class CarDetailsActivity extends BaseActivity {
             String price = getIntent().getStringExtra("price");
             int imageResId = getIntent().getIntExtra("imageResId", 0);
 
-            // Name
             if (carName != null) {
                 tvName.setText(carName);
             } else {
                 tvName.setText(R.string.unknown_car);
             }
 
-            // Price (formatted)
             if (price != null) {
                 tvPrice.setText(getString(R.string.price_per_day, price));
             } else {
@@ -79,10 +75,8 @@ public class CarDetailsActivity extends BaseActivity {
                 );
             }
 
-            // Description
             tvDescription.setText(R.string.default_description);
 
-            // Features (default values)
             tvFeatures.setText(
                     getString(
                             R.string.car_features,
@@ -92,20 +86,24 @@ public class CarDetailsActivity extends BaseActivity {
                     )
             );
 
-            // Image
             if (imageResId != 0) {
                 imgCar.setImageResource(imageResId);
             } else {
-                imgCar.setImageResource(R.drawable.car1); // fallback
+                imgCar.setImageResource(R.drawable.car1);
             }
         }
 
-        // 🔥 Book button
+        // 🔥 Book button (UPDATED)
         btnBook.setOnClickListener(v -> {
             Intent intent = new Intent(CarDetailsActivity.this, BookingActivity.class);
 
+            // Existing data
             intent.putExtra("carName", tvName.getText().toString());
             intent.putExtra("price", tvPrice.getText().toString());
+
+            // 🔥 Pass role & userId forward
+            intent.putExtra("role", getIntent().getStringExtra("role"));
+            intent.putExtra("userId", getIntent().getStringExtra("userId"));
 
             startActivity(intent);
         });

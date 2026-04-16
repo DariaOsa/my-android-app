@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#F5F5F5">
+
+    <ImageView
+        android:id="@+id/Logo"
+        android:layout_width="wrap_content"
+        android:layout_height="183dp"
+        app:srcCompat="@drawable/logo" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="275dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/login"
+        android:textSize="20sp"
+        app:cornerRadius="10dp" />
+
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="190dp"
+        android:layout_height="50dp"
+        android:text="@string/register"
+        app:cornerRadius="10dp" />
+
+    <Space
+        android:layout_width="30dp"
+        android:layout_height="56dp" />
+
+    <!-- 🌍 LANGUAGE SWITCH (FLAGS) -->
+    <LinearLayout
+        android:layout_width="130dp"
+        android:layout_height="48dp"
+        android:background="#7C454545"
+        android:gravity="center"
+        android:minHeight="100dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgEnglish"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="8dp"
+            android:clickable="true"
+            android:contentDescription="@string/lang_english"
+            android:focusable="true"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@mipmap/flag_en" />
+
+        <ImageView
+            android:id="@+id/imgGreek"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:clickable="true"
+            android:contentDescription="@string/lang_greek"
+            android:focusable="true"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@mipmap/flag_gr" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -88,4 +88,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return exists;
     }
+    // 👤 Get user by ID (for Profile screen)
+    public Cursor getUserById(String userId) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        return db.rawQuery(
+                "SELECT * FROM " + TABLE_USERS + " WHERE id=?",
+                new String[]{userId}
+        );
+    }
 }

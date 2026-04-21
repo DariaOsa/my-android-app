@@ -134,6 +134,13 @@
                     android:textColor="#111"
                     android:layout_marginTop="2dp"/>
 
+                <TextView
+                    android:id="@+id/txtDistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Distance: -- km"
+                    android:textSize="16sp"
+                    android:layout_marginTop="8dp"/>
                 <!-- 🟢 STATUS -->
                 <TextView
                     android:id="@+id/txtStatus"

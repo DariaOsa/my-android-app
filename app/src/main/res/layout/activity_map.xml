@@ -24,6 +24,48 @@
         android:background="@drawable/fab_fake"
         android:elevation="8dp" />
 
+    <!-- 🚀 UBER-STYLE SEARCH CARD -->
+    <LinearLayout
+        android:id="@+id/searchCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:background="@drawable/ride_card_bg"
+        android:elevation="12dp"
+        android:padding="16dp"
+        android:layout_gravity="top">
+
+        <!-- 📍 CURRENT LOCATION -->
+        <TextView
+            android:id="@+id/txtCurrentLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 Getting your location..."
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:paddingBottom="8dp"/>
+
+        <!-- 🔍 DESTINATION INPUT -->
+        <EditText
+            android:id="@+id/edtDestination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Where to?"
+            android:background="@android:color/transparent"
+            android:textSize="18sp"
+            android:padding="8dp"/>
+        <Button
+            android:id="@+id/btnConfirmDestination"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Confirm Destination"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:background="#2196F3"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
     <!-- 🚗 RIDE OVERLAY -->
     <LinearLayout
         android:id="@+id/rideOverlay"
@@ -61,6 +103,16 @@
             android:textColor="#FFFFFF"
             android:background="@drawable/btn_danger"/>
     </LinearLayout>
-
+    <ImageButton
+        android:id="@+id/btnProfile"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:background="@drawable/fab_fake"
+        android:src="@drawable/ic_profile"
+        android:padding="12dp"
+        android:elevation="20dp"
+        android:contentDescription="Profile"/>
 </FrameLayout>
 

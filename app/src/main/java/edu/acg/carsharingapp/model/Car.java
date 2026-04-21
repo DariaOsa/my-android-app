@@ -14,6 +14,16 @@ public class Car implements Serializable {
     private String fuelType;
     private String transmission;
 
+    // 🔗 Trip connection
+    private String tripId;
+
+    // 📍 Location
+    private double latitude;
+    private double longitude;
+
+    // 📏 OPTIONAL: cached distance (useful for sorting later)
+    private float distanceKm;
+
     // 🔥 REQUIRED (Firebase / Serialization)
     public Car() {}
 
@@ -91,4 +101,48 @@ public class Car implements Serializable {
     public String getFuelType() { return fuelType; }
 
     public String getTransmission() { return transmission; }
+
+    // =========================
+    // 📍 LOCATION
+    // =========================
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    // =========================
+    // 📏 DISTANCE (OPTIONAL)
+    // =========================
+
+    public float getDistanceKm() {
+        return distanceKm;
+    }
+
+    public void setDistanceKm(float distanceKm) {
+        this.distanceKm = distanceKm;
+    }
+
+    // =========================
+    // 🔗 TRIP ID
+    // =========================
+
+    public String getTripId() {
+        return tripId;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
+    }
 }

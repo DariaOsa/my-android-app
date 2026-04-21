@@ -63,7 +63,7 @@ public class Trip {
     }
 
     public String getFormattedPrice() {
-        return String.format("€%.2f / trip", price);
+        return String.format("€%.2f", price);
     }
 
     public String getFormattedTime() {
@@ -87,6 +87,13 @@ public class Trip {
             default:
                 return "UNKNOWN";
         }
+    }
+
+    // 🔥 NEW: Used in Profile history
+    public String getHistoryText() {
+        return carName
+                + " • €" + price
+                + " • " + getFormattedTime();
     }
 
     // =========================
@@ -178,7 +185,11 @@ public class Trip {
     // =========================
 
     public boolean hasPassenger(String userId) {
-        return getPassengers().containsKey(userId);
+        return userId != null && getPassengers().containsKey(userId);
+    }
+
+    public boolean isDriver(String userId) {
+        return userId != null && userId.equals(driverId);
     }
 
     public boolean hasAvailableSeats() {

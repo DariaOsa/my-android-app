@@ -2,7 +2,6 @@ package edu.acg.carsharingapp.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.acg.carsharingapp.R;
-import edu.acg.carsharingapp.model.DatabaseHelper;
 import edu.acg.carsharingapp.model.Trip;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -53,30 +52,40 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         userId = prefs.getString("userId", null);
 
-        // =========================
-        // ✅ Load user (SQLite)
-        // =========================
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-
-        if (userId != null) {
-            Cursor cursor = dbHelper.getUserById(userId);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                String name = cursor.getString(
-                        cursor.getColumnIndexOrThrow(DatabaseHelper.COL_USER_NAME));
-
-                String email = cursor.getString(
-                        cursor.getColumnIndexOrThrow(DatabaseHelper.COL_USER_EMAIL));
-
-                txtName.setText(name);
-                txtEmail.setText(email);
-            }
-
-            if (cursor != null) cursor.close();
+        if (userId == null) {
+            // Safety fallback
+            finish();
+            return;
         }
 
         // =========================
-        // ✅ FIREBASE HISTORY (PERSONAL)
+        // ✅ LOAD USER FROM FIREBASE
+        // =========================
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(userId);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.exists()) {
+                    String name = snapshot.child("name").getValue(String.class);
+                    String email = snapshot.child("email").getValue(String.class);
+
+                    txtName.setText(name != null ? name : "No name");
+                    txtEmail.setText(email != null ? email : "No email");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                error.toException().printStackTrace();
+            }
+        });
+
+        // =========================
+        // ✅ FIREBASE HISTORY
         // =========================
 
         DatabaseReference historyRef =
@@ -101,7 +110,6 @@ public class ProfileActivity extends AppCompatActivity {
                     Trip trip = snap.getValue(Trip.class);
                     if (trip == null) continue;
 
-                    // ✅ PERSONAL FILTER
                     historyList.add(trip.getHistoryText());
                 }
 
@@ -120,6 +128,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnLogout.setOnClickListener(v -> {
 
+            // 🔥 Firebase logout
+            FirebaseAuth.getInstance().signOut();
+
+            // 🔥 Clear session
             getSharedPreferences("session", MODE_PRIVATE)
                     .edit()
                     .clear()
@@ -132,7 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    // ✅ Back arrow click
+    // ✅ Back arrow
     @Override
     public boolean onSupportNavigateUp() {
         finish();

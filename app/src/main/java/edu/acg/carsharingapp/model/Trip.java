@@ -6,202 +6,87 @@ import java.util.Map;
 public class Trip {
 
     public static final String STATUS_AVAILABLE = "AVAILABLE";
-    public static final String STATUS_BOOKED = "BOOKED";
     public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
     public static final String STATUS_COMPLETED = "COMPLETED";
 
     private String tripId;
+
+    // 👤 Driver
     private String driverId;
 
-    // 🚗 CAR SNAPSHOT
+    // 🚗 Snapshot (UI info)
     private String carName;
     private double price;
 
-    // 📍 ROUTE (TEXT)
-    private String fromLocation;
-    private String toLocation;
+    // 📍 CURRENT POSITION
+    private double currentLat;
+    private double currentLng;
 
-    // 📍 ROUTE (COORDINATES)
-    private double fromLat;
-    private double fromLng;
+    // 🎯 Destination
     private double toLat;
     private double toLng;
 
-    // ⏰ TIME
-    private String departureTime;
+    // 🧭 ROUTE (Google Directions encoded polyline)
+    private String routePolyline;
 
-    private int availableSeats;
-    private String status;
+    // 📍 HUMAN-READABLE ADDRESSES (for UI/history)
+    private String fromAddress;
+    private String toAddress;
+
+    // 👥 Passengers
     private Map<String, Boolean> passengers;
 
-    // 🔥 REQUIRED EMPTY CONSTRUCTOR (Firebase)
+    private int availableSeats;
+
+    // 🔄 State
+    private String status;
+
+    // ⏱️ Time
+    private long createdAt;
+    private long startedAt;
+    private long completedAt;
+
+    // 🔥 Required for Firebase
     public Trip() {}
 
-    public Trip(String tripId, String driverId, String carName,
-                double price, String fromLocation, String toLocation,
-                String departureTime, int availableSeats) {
+    // =========================
+    // 🏗️ CONSTRUCTOR (AVAILABLE CAR)
+    // =========================
 
+    public Trip(String tripId, double lat, double lng, int seats) {
         this.tripId = tripId;
-        this.driverId = driverId;
-        this.carName = carName;
-        this.price = price;
-        this.fromLocation = fromLocation;
-        this.toLocation = toLocation;
-        this.departureTime = departureTime;
-        this.availableSeats = availableSeats;
+        this.currentLat = lat;
+        this.currentLng = lng;
+        this.availableSeats = seats;
         this.status = STATUS_AVAILABLE;
         this.passengers = new HashMap<>();
+        this.createdAt = System.currentTimeMillis();
     }
 
     // =========================
-    // 📦 DISPLAY HELPERS
+    // 🧠 BUSINESS RULES
     // =========================
 
-    public String getRoute() {
-        if (fromLocation == null || toLocation == null) return "Unknown route";
-        return fromLocation + " → " + toLocation;
+    public boolean canStart(String userId) {
+        return STATUS_AVAILABLE.equals(status) && driverId == null;
     }
 
-    public String getFormattedPrice() {
-        return String.format("€%.2f", price);
-    }
-
-    public String getFormattedTime() {
-        return departureTime != null ? departureTime : "Unknown time";
-    }
-
-    public String getSeatsText() {
-        return availableSeats + " seats available";
-    }
-
-    public String getStatusDisplay() {
-        switch (status) {
-            case STATUS_AVAILABLE:
-                return "AVAILABLE";
-            case STATUS_IN_PROGRESS:
-                return "IN PROGRESS";
-            case STATUS_COMPLETED:
-                return "COMPLETED";
-            case STATUS_BOOKED:
-                return "FULL";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    // 🔥 NEW: Used in Profile history
-    public String getHistoryText() {
-        return carName
-                + " • €" + price
-                + " • " + getFormattedTime();
-    }
-
-    // =========================
-    // 📥 GETTERS
-    // =========================
-
-    public String getTripId() { return tripId; }
-    public String getDriverId() { return driverId; }
-    public String getCarName() { return carName; }
-    public double getPrice() { return price; }
-    public String getFromLocation() { return fromLocation; }
-    public String getToLocation() { return toLocation; }
-    public String getDepartureTime() { return departureTime; }
-    public int getAvailableSeats() { return availableSeats; }
-    public String getStatus() { return status; }
-
-    public double getFromLat() { return fromLat; }
-    public double getFromLng() { return fromLng; }
-    public double getToLat() { return toLat; }
-    public double getToLng() { return toLng; }
-
-    public Map<String, Boolean> getPassengers() {
-        if (passengers == null) passengers = new HashMap<>();
-        return passengers;
-    }
-
-    // =========================
-    // ✏️ SETTERS
-    // =========================
-
-    public void setTripId(String tripId) {
-        this.tripId = tripId;
-    }
-
-    public void setDriverId(String driverId) {
-        this.driverId = driverId;
-    }
-
-    public void setCarName(String carName) {
-        this.carName = carName;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setFromLocation(String fromLocation) {
-        this.fromLocation = fromLocation;
-    }
-
-    public void setToLocation(String toLocation) {
-        this.toLocation = toLocation;
-    }
-
-    public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
-    }
-
-    public void setAvailableSeats(int availableSeats) {
-        this.availableSeats = availableSeats;
-    }
-
-    public void setPassengers(Map<String, Boolean> passengers) {
-        this.passengers = passengers;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setFromLat(double fromLat) {
-        this.fromLat = fromLat;
-    }
-
-    public void setFromLng(double fromLng) {
-        this.fromLng = fromLng;
-    }
-
-    public void setToLat(double toLat) {
-        this.toLat = toLat;
-    }
-
-    public void setToLng(double toLng) {
-        this.toLng = toLng;
-    }
-
-    // =========================
-    // 🧠 BUSINESS LOGIC
-    // =========================
-
-    public boolean hasPassenger(String userId) {
-        return userId != null && getPassengers().containsKey(userId);
+    public boolean canJoin(String userId) {
+        return STATUS_IN_PROGRESS.equals(status)
+                && availableSeats > 0
+                && driverId != null;
     }
 
     public boolean isDriver(String userId) {
         return userId != null && userId.equals(driverId);
     }
 
-    public boolean hasAvailableSeats() {
-        return availableSeats > 0;
+    public boolean hasPassenger(String userId) {
+        return passengers != null && passengers.containsKey(userId);
     }
 
     public boolean isAvailable() {
         return STATUS_AVAILABLE.equals(status);
-    }
-
-    public boolean isBooked() {
-        return STATUS_BOOKED.equals(status);
     }
 
     public boolean isInProgress() {
@@ -212,11 +97,77 @@ public class Trip {
         return STATUS_COMPLETED.equals(status);
     }
 
-    public boolean isFull() {
-        return availableSeats <= 0;
+    // =========================
+    // 📥 GETTERS
+    // =========================
+
+    public String getTripId() { return tripId; }
+    public String getDriverId() { return driverId; }
+    public String getCarName() { return carName; }
+    public double getPrice() { return price; }
+    public double getCurrentLat() { return currentLat; }
+    public double getCurrentLng() { return currentLng; }
+    public double getToLat() { return toLat; }
+    public double getToLng() { return toLng; }
+
+    public String getRoutePolyline() { return routePolyline; }
+
+    public String getFromAddress() { return fromAddress; }
+    public String getToAddress() { return toAddress; }
+
+    public int getAvailableSeats() { return availableSeats; }
+    public String getStatus() { return status; }
+    public long getCreatedAt() { return createdAt; }
+    public long getStartedAt() { return startedAt; }
+    public long getCompletedAt() { return completedAt; }
+
+    public Map<String, Boolean> getPassengers() {
+        if (passengers == null) passengers = new HashMap<>();
+        return passengers;
     }
 
-    public int getPassengerCount() {
-        return getPassengers().size();
+    // =========================
+    // ✏️ SETTERS
+    // =========================
+
+    public void setDriverId(String driverId) { this.driverId = driverId; }
+    public void setCarName(String carName) { this.carName = carName; }
+    public void setPrice(double price) { this.price = price; }
+    public void setCurrentLat(double currentLat) { this.currentLat = currentLat; }
+    public void setCurrentLng(double currentLng) { this.currentLng = currentLng; }
+    public void setToLat(double toLat) { this.toLat = toLat; }
+    public void setToLng(double toLng) { this.toLng = toLng; }
+
+    public void setRoutePolyline(String routePolyline) { this.routePolyline = routePolyline; }
+
+    public void setFromAddress(String fromAddress) { this.fromAddress = fromAddress; }
+    public void setToAddress(String toAddress) { this.toAddress = toAddress; }
+
+    public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
+    public void setStatus(String status) { this.status = status; }
+    public void setStartedAt(long startedAt) { this.startedAt = startedAt; }
+    public void setCompletedAt(long completedAt) { this.completedAt = completedAt; }
+
+    public void setPassengers(Map<String, Boolean> passengers) {
+        this.passengers = passengers;
+    }
+
+    // =========================
+    // 📦 UI HELPERS
+    // =========================
+
+    public String getSeatsText() {
+        return availableSeats + " seats available";
+    }
+
+    public String getFormattedPrice() {
+        return String.format("€%.2f", price);
+    }
+
+    public String getHistoryText() {
+        if (fromAddress != null && toAddress != null) {
+            return fromAddress + " → " + toAddress;
+        }
+        return carName + " • €" + price;
     }
 }

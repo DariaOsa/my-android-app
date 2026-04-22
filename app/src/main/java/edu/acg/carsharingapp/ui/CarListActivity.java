@@ -17,20 +17,19 @@ import java.util.List;
 
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.adapter.CarAdapter;
-import edu.acg.carsharingapp.data.CarRepository;
-import edu.acg.carsharingapp.model.Car;
 import edu.acg.carsharingapp.model.Trip;
 
 public class CarListActivity extends BaseActivity {
 
     private DatabaseReference tripsRef;
     private RecyclerView recyclerView;
+
     private String role;
+    private String userId;
 
     private LatLng userLocation;
 
-    // ✅ NEW: sorting mode
-    private String sortMode = "DISTANCE"; // default
+    private String sortMode = "DISTANCE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,41 +45,23 @@ public class CarListActivity extends BaseActivity {
 
         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
         role = prefs.getString("role", "PASSENGER");
+        userId = prefs.getString("userId", null);
 
         tripsRef = FirebaseDatabase.getInstance().getReference("trips");
 
-        // ✅ OPTIONAL: hook buttons if you added them in XML
         Button btnSortDistance = findViewById(R.id.btnSortDistance);
         Button btnSortPrice = findViewById(R.id.btnSortPrice);
-        // ✅ Default = DISTANCE selected on screen load
-        btnSortDistance.setTextColor(getColor(R.color.blue));
-        btnSortPrice.setTextColor(getColor(R.color.gray));
 
-// Optional but recommended (match background too)
-        btnSortDistance.setBackgroundResource(R.drawable.bg_sort_button_selected);
-        btnSortPrice.setBackgroundResource(R.drawable.bg_sort_button);
+        if (btnSortDistance != null && btnSortPrice != null) {
 
-        if (btnSortDistance != null) {
             btnSortDistance.setOnClickListener(v -> {
                 sortMode = "DISTANCE";
-                btnSortDistance.setBackgroundResource(R.drawable.bg_sort_button_selected);
-                btnSortPrice.setBackgroundResource(R.drawable.bg_sort_button);
-                btnSortDistance.setTextColor(getColor(R.color.blue));   // active
-                btnSortPrice.setTextColor(getColor(R.color.gray));
-
-                loadCars();
+                loadTrips();
             });
-        }
 
-        if (btnSortPrice != null) {
             btnSortPrice.setOnClickListener(v -> {
                 sortMode = "PRICE";
-                btnSortDistance.setBackgroundResource(R.drawable.bg_sort_button_selected);
-                btnSortPrice.setBackgroundResource(R.drawable.bg_sort_button);
-                btnSortDistance.setTextColor(getColor(R.color.gray));   // inactive
-                btnSortPrice.setTextColor(getColor(R.color.blue));
-
-                loadCars();
+                loadTrips();
             });
         }
 
@@ -109,11 +90,8 @@ public class CarListActivity extends BaseActivity {
         client.getLastLocation().addOnSuccessListener(location -> {
 
             if (location != null) {
-                userLocation = new LatLng(
-                        location.getLatitude(),
-                        location.getLongitude()
-                );
-                loadCars();
+                userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                loadTrips();
 
             } else {
                 client.getCurrentLocation(
@@ -122,15 +100,12 @@ public class CarListActivity extends BaseActivity {
                 ).addOnSuccessListener(loc -> {
 
                     if (loc != null) {
-                        userLocation = new LatLng(
-                                loc.getLatitude(),
-                                loc.getLongitude()
-                        );
+                        userLocation = new LatLng(loc.getLatitude(), loc.getLongitude());
                     } else {
                         userLocation = new LatLng(37.9838, 23.7275);
                     }
 
-                    loadCars();
+                    loadTrips();
                 });
             }
         });
@@ -155,56 +130,35 @@ public class CarListActivity extends BaseActivity {
     // 🚗 MAIN LOGIC
     // =========================
 
-    private void loadCars() {
+    private void loadTrips() {
 
         tripsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
 
-                List<Car> filteredCars = new ArrayList<>();
+                List<Trip> filteredTrips = new ArrayList<>();
 
                 for (DataSnapshot snap : snapshot.getChildren()) {
+
                     Trip trip = snap.getValue(Trip.class);
                     if (trip == null) continue;
 
                     boolean show;
 
                     if ("DRIVER".equals(role)) {
+                        // Driver sees available cars
                         show = Trip.STATUS_AVAILABLE.equals(trip.getStatus());
                     } else {
+                        // Passenger sees active rides (not their own)
                         show = Trip.STATUS_IN_PROGRESS.equals(trip.getStatus())
-                                && trip.hasAvailableSeats();
+                                && trip.getDriverId() != null
+                                && !trip.getDriverId().equals(userId)
+                                && trip.getAvailableSeats() > 0;
                     }
 
                     if (!show) continue;
 
-                    Car baseCar = CarRepository.getCarByName(trip.getCarName());
-                    if (baseCar == null) continue;
-
-                    Car car = new Car(
-                            baseCar.getBrand(),
-                            baseCar.getModel(),
-                            baseCar.getCategory(),
-                            baseCar.getPricePerTrip(),
-                            baseCar.getRating(),
-                            baseCar.getImageResId(),
-                            baseCar.getSeats(),
-                            baseCar.getFuelType(),
-                            baseCar.getTransmission()
-                    );
-
-                    car.setTripId(snap.getKey());
-                    car.setLatitude(trip.getFromLat());
-                    car.setLongitude(trip.getFromLng());
-
-                    // ✅ NEW: calculate distance ONCE
-                    if (userLocation != null) {
-                        LatLng carLoc = new LatLng(car.getLatitude(), car.getLongitude());
-                        float distance = getDistanceKm(userLocation, carLoc);
-                        car.setDistanceKm(distance);
-                    }
-
-                    filteredCars.add(car);
+                    filteredTrips.add(trip);
                 }
 
                 // =========================
@@ -212,23 +166,42 @@ public class CarListActivity extends BaseActivity {
                 // =========================
 
                 if ("PRICE".equals(sortMode)) {
-                    Collections.sort(filteredCars, (a, b) ->
-                            Double.compare(a.getPricePerTrip(), b.getPricePerTrip()));
+
+                    Collections.sort(filteredTrips, (a, b) ->
+                            Double.compare(a.getPrice(), b.getPrice()));
+
                 } else {
-                    Collections.sort(filteredCars, (a, b) ->
-                            Float.compare(a.getDistanceKm(), b.getDistanceKm()));
+
+                    Collections.sort(filteredTrips, (a, b) -> {
+
+                        float distA = getDistanceKm(userLocation,
+                                new LatLng(a.getCurrentLat(), a.getCurrentLng()));
+
+                        float distB = getDistanceKm(userLocation,
+                                new LatLng(b.getCurrentLat(), b.getCurrentLng()));
+
+                        return Float.compare(distA, distB);
+                    });
                 }
 
-                CarAdapter adapter = new CarAdapter(filteredCars, userLocation, car -> {
+                // =========================
+                // 🔗 ADAPTER
+                // =========================
 
-                    Intent intent = new Intent(CarListActivity.this, BookingActivity.class);
+                CarAdapter adapter = new CarAdapter(
+                        filteredTrips,
+                        userLocation,
+                        trip -> {
 
-                    intent.putExtra("tripId", car.getTripId());
-                    intent.putExtra("userLat", userLocation.latitude);
-                    intent.putExtra("userLng", userLocation.longitude);
+                            Intent intent = new Intent(CarListActivity.this, BookingActivity.class);
 
-                    startActivity(intent);
-                });
+                            intent.putExtra("tripId", trip.getTripId());
+                            intent.putExtra("userLat", userLocation.latitude);
+                            intent.putExtra("userLng", userLocation.longitude);
+
+                            startActivity(intent);
+                        }
+                );
 
                 recyclerView.setAdapter(adapter);
             }
@@ -239,10 +212,11 @@ public class CarListActivity extends BaseActivity {
     }
 
     // =========================
-    // 📏 DISTANCE HELPER
+    // 📏 DISTANCE
     // =========================
 
     private float getDistanceKm(LatLng a, LatLng b) {
+
         float[] results = new float[1];
 
         android.location.Location.distanceBetween(

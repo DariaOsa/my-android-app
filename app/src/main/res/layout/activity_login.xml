@@ -14,7 +14,8 @@
         android:text="Login"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:layout_marginBottom="30dp"/>
+        android:textColor="#000000"
+        android:layout_marginBottom="30dp" />
 
     <!-- 📧 Email -->
     <EditText
@@ -23,7 +24,8 @@
         android:layout_height="50dp"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:layout_marginBottom="15dp"/>
+        android:autofillHints="emailAddress"
+        android:layout_marginBottom="15dp" />
 
     <!-- 🔒 Password -->
     <EditText
@@ -32,7 +34,8 @@
         android:layout_height="50dp"
         android:hint="Password"
         android:inputType="textPassword"
-        android:layout_marginBottom="25dp"/>
+        android:autofillHints="password"
+        android:layout_marginBottom="25dp" />
 
     <!-- 👤 Role label -->
     <TextView
@@ -40,7 +43,8 @@
         android:layout_height="wrap_content"
         android:text="Login as:"
         android:textSize="16sp"
-        android:layout_marginBottom="12dp"/>
+        android:textColor="#444444"
+        android:layout_marginBottom="12dp" />
 
     <!-- 🚗 DRIVER BUTTON -->
     <Button
@@ -48,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login as Driver"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginBottom="10dp" />
 
     <!-- 👤 PASSENGER BUTTON -->
     <Button
@@ -56,13 +60,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login as Passenger"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp" />
 
-    <!-- 🆕 REGISTER -->
-    <Button
-        android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvRegister"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register"/>
+        android:text="Don't have an account? Register"
+        android:textColor="#1976D2"
+        android:textSize="14sp"
+        android:layout_marginTop="20dp"
+        android:clickable="true"
+        android:focusable="true" />
+
 
 </LinearLayout>

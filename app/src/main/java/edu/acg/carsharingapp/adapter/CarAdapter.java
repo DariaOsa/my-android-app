@@ -14,32 +14,28 @@ import java.util.List;
 
 import edu.acg.carsharingapp.R;
 import edu.acg.carsharingapp.model.Car;
+import edu.acg.carsharingapp.model.Trip;
+import edu.acg.carsharingapp.data.CarCatalog;
 
 public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
 
+    private List<Trip> tripList;
     private LatLng userLocation;
-    private List<Car> carList;
     private OnCarClickListener listener;
 
-    // 🔥 Click interface
     public interface OnCarClickListener {
-        void onItemClick(Car car);
+        void onItemClick(Trip trip);
     }
 
-    public CarAdapter(List<Car> cars, LatLng userLocation, OnCarClickListener listener) {
-        this.carList = cars;
+    public CarAdapter(List<Trip> trips, LatLng userLocation, OnCarClickListener listener) {
+        this.tripList = trips;
         this.userLocation = userLocation;
         this.listener = listener;
     }
 
     public static class CarViewHolder extends RecyclerView.ViewHolder {
 
-        TextView name;
-        TextView meta;
-        TextView details;
-        TextView price;
-        TextView distance;
-        TextView status;
+        TextView name, meta, details, price, distance, status;
         ImageView image;
 
         public CarViewHolder(View itemView) {
@@ -65,14 +61,21 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
     @Override
     public void onBindViewHolder(CarViewHolder holder, int position) {
 
-        Car car = carList.get(position);
+        Trip trip = tripList.get(position);
+
+        // 🔗 Get matching Car template
+        Car car = CarCatalog.getCarByName(trip.getCarName());
+
+        if (car == null) return;
 
         // 🚗 NAME
         holder.name.setText(car.getDisplayName());
 
         // ⭐ CATEGORY + RATING
         if (holder.meta != null) {
-            holder.meta.setText(car.getCategoryWithRating());
+            holder.meta.setText(
+                    car.getCategory() + " • ⭐ " + car.getRating()
+            );
         }
 
         // ⚙️ SPECS
@@ -84,12 +87,12 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
             );
         }
 
-        // 💶 PRICE
-        holder.price.setText(car.getFormattedPrice());
+        // 💶 PRICE (from Trip)
+        holder.price.setText(trip.getFormattedPrice());
 
         // 🟢 STATUS
         if (holder.status != null) {
-            holder.status.setText("READY");
+            holder.status.setText(trip.getStatus());
         }
 
         // 🖼️ IMAGE
@@ -97,17 +100,17 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
             holder.image.setImageResource(car.getImageResId());
         }
 
-        // ✅ FIXED DISTANCE (real, consistent)
+        // 📏 DISTANCE (from Trip location)
         if (holder.distance != null && userLocation != null) {
 
-            double carLat = car.getLatitude();
-            double carLng = car.getLongitude();
+            double lat = trip.getCurrentLat();
+            double lng = trip.getCurrentLng();
 
             float[] results = new float[1];
 
             android.location.Location.distanceBetween(
                     userLocation.latitude, userLocation.longitude,
-                    carLat, carLng,
+                    lat, lng,
                     results
             );
 
@@ -119,13 +122,13 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
         // 🔥 CLICK
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(car);
+                listener.onItemClick(trip);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return carList.size();
+        return tripList.size();
     }
 }

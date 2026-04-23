@@ -46,6 +46,9 @@ public class Trip {
     private long startedAt;
     private long completedAt;
 
+    // 💰 Final price (after ride)
+    private double finalPrice;
+
     // 🔥 Required for Firebase
     public Trip() {}
 
@@ -110,6 +113,10 @@ public class Trip {
     public double getToLat() { return toLat; }
     public double getToLng() { return toLng; }
 
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
     public String getRoutePolyline() { return routePolyline; }
 
     public String getFromAddress() { return fromAddress; }
@@ -148,6 +155,10 @@ public class Trip {
     public void setStartedAt(long startedAt) { this.startedAt = startedAt; }
     public void setCompletedAt(long completedAt) { this.completedAt = completedAt; }
 
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+
     public void setPassengers(Map<String, Boolean> passengers) {
         this.passengers = passengers;
     }
@@ -165,9 +176,15 @@ public class Trip {
     }
 
     public String getHistoryText() {
-        if (fromAddress != null && toAddress != null) {
-            return fromAddress + " → " + toAddress;
+
+        String routePart = (fromAddress != null && toAddress != null)
+                ? fromAddress + " → " + toAddress
+                : carName;
+
+        if (finalPrice > 0) {
+            return routePart + " • €" + String.format("%.2f", finalPrice);
+        } else {
+            return routePart + " • €" + String.format("%.2f", price) + "/km";
         }
-        return carName + " • €" + price;
     }
 }

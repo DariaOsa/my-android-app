@@ -168,6 +168,14 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         String activeTrip = prefs.getString("activeTripId", null);
         boolean pickingDestination = prefs.getBoolean("pickingDestination", false);
 
+        // ✅ Profile button visibility
+        if (activeTrip != null) {
+            btnProfile.setVisibility(View.GONE);
+        } else {
+            btnProfile.setVisibility(View.VISIBLE);
+        }
+
+        // ✅ Main UI logic (ONLY ONCE)
         if (activeTrip != null && pickingDestination) {
             searchCard.setVisibility(View.VISIBLE);
             enableDestinationPicking(activeTrip);
@@ -181,7 +189,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             showBrowsingMode();
         }
     }
-
     private void showBrowsingMode() {
 
         rideOverlay.setVisibility(View.GONE);
@@ -392,6 +399,18 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                                         "Route unavailable",
                                         Toast.LENGTH_SHORT).show();
                             }
+                            double distanceKm = calculateRouteDistanceKm(route);
+
+// get price per km from trip
+                            double pricePerKm = trip.getPrice();
+
+                            double estimatedPrice = pricePerKm * distanceKm;
+
+                            runOnUiThread(() -> {
+                                Toast.makeText(MapActivity.this,
+                                        String.format("Estimated price: €%.2f", estimatedPrice),
+                                        Toast.LENGTH_LONG).show();
+                            });
 
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -502,59 +521,79 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                         Trip trip = snapshot.getValue(Trip.class);
                         if (trip == null) return;
 
-                        Map<String, Object> updates = new HashMap<>();
+                        DatabaseReference historyRef = FirebaseDatabase.getInstance()
+                                .getReference("history")
+                                .child(userId);
 
-// ✅ ONLY update position when ride ENDS
-                        if (selectedDestination != null) {
-                            updates.put("currentLat", selectedDestination.latitude);
-                            updates.put("currentLng", selectedDestination.longitude);
-                        }
+                        new Thread(() -> {
 
-                        updates.put("status", Trip.STATUS_AVAILABLE);
-                        updates.put("driverId", null);
-                        updates.put("toLat", 0);
-                        updates.put("toLng", 0);
-                        updates.put("passengers", new HashMap<>());
+                            LatLng from = new LatLng(trip.getCurrentLat(), trip.getCurrentLng());
+                            LatLng to = new LatLng(trip.getToLat(), trip.getToLng());
 
-                        tripsRef.child(currentRideTripId).updateChildren(updates)
-                                .addOnCompleteListener(task -> {
-                                    DatabaseReference historyRef = FirebaseDatabase.getInstance()
-                                            .getReference("history")
-                                            .child(userId);
+                            List<LatLng> route = getRouteFromApi(from, to);
 
-                                    tripsRef.child(currentRideTripId)
-                                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            double distanceKm = 0;
 
-                                                    Trip trip = snapshot.getValue(Trip.class);
-                                                    if (trip == null) return;
+                            if (route != null && !route.isEmpty()) {
+                                distanceKm = calculateRouteDistanceKm(route);
+                            }
 
-                                                    String historyId = historyRef.push().getKey();
-                                                    historyRef.child(historyId).setValue(trip);
-                                                }
+                            // 🔥 fallback (important)
+                            if (distanceKm == 0) {
+                                float[] results = new float[1];
+                                android.location.Location.distanceBetween(
+                                        from.latitude, from.longitude,
+                                        to.latitude, to.longitude,
+                                        results
+                                );
+                                distanceKm = results[0] / 1000.0;
+                            }
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {}
-                                            });
+                            double finalPrice = trip.getPrice() * distanceKm;
+                            trip.setFinalPrice(finalPrice);
 
-                                    // ✅ clear session AFTER DB update
-                                    getSharedPreferences("session", MODE_PRIVATE)
-                                            .edit()
-                                            .remove("activeTripId")
-                                            .remove("pickingDestination")
-                                            .apply();
+                            runOnUiThread(() -> {
 
-                                    currentRideTripId = null;
+                                // ✅ SAVE HISTORY FIRST
+                                String historyId = historyRef.push().getKey();
+                                historyRef.child(historyId).setValue(trip);
 
-                                    stopCarAnimation();
+                                // ✅ THEN RESET TRIP
+                                Map<String, Object> updates = new HashMap<>();
 
-                                    Toast.makeText(MapActivity.this,
-                                            "Ride ended",
-                                            Toast.LENGTH_SHORT).show();
+                                // keep final location (important)
+                                if (selectedDestination != null) {
+                                    updates.put("currentLat", selectedDestination.latitude);
+                                    updates.put("currentLng", selectedDestination.longitude);
+                                }
 
-                                    refreshUI(); // now safe ✔
-                                });
+                                updates.put("status", Trip.STATUS_AVAILABLE);
+                                updates.put("driverId", null);
+                                updates.put("toLat", 0);
+                                updates.put("toLng", 0);
+                                updates.put("passengers", new HashMap<>());
+
+                                tripsRef.child(currentRideTripId).updateChildren(updates);
+
+                                // ✅ session cleanup
+                                getSharedPreferences("session", MODE_PRIVATE)
+                                        .edit()
+                                        .remove("activeTripId")
+                                        .remove("pickingDestination")
+                                        .apply();
+
+                                currentRideTripId = null;
+
+                                stopCarAnimation();
+
+                                Toast.makeText(MapActivity.this,
+                                        "Ride ended",
+                                        Toast.LENGTH_SHORT).show();
+
+                                refreshUI();
+                            });
+
+                        }).start();
                     }
 
                     @Override
@@ -736,6 +775,23 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         }
 
         return poly;
+    }
+    private double calculateRouteDistanceKm(List<LatLng> route) {
+        double distance = 0;
+
+        for (int i = 0; i < route.size() - 1; i++) {
+            float[] results = new float[1];
+
+            android.location.Location.distanceBetween(
+                    route.get(i).latitude, route.get(i).longitude,
+                    route.get(i + 1).latitude, route.get(i + 1).longitude,
+                    results
+            );
+
+            distance += results[0]; // meters
+        }
+
+        return distance / 1000.0; // km
     }
 
     private void startCarAnimation(List<LatLng> route) {

@@ -94,6 +94,8 @@ public class BookingActivity extends BaseActivity {
 
         btnJoin = findViewById(R.id.btnJoin);
         imgCar = findViewById(R.id.imgCar);
+        findViewById(R.id.txtRoute).setVisibility(View.GONE);
+        findViewById(R.id.txtTime).setVisibility(View.GONE);
     }
 
     private void loadSession() {
@@ -115,7 +117,8 @@ public class BookingActivity extends BaseActivity {
                 bindCarUI(car);
 
                 txtSeats.setText(trip.getAvailableSeats() + " seats available");
-                txtPrice.setText(trip.getFormattedPrice());
+                double pricePerKm = trip.getPrice();
+                txtPrice.setText(String.format("€%.2f / km", pricePerKm));
                 txtStatus.setText(trip.getStatus());
 
                 if (userLocation != null) {
@@ -131,7 +134,7 @@ public class BookingActivity extends BaseActivity {
                         );
                     }
 
-                    float distance = getDistanceKm(userLocation, carLoc);
+                    float distance = Math.round(getDistanceKm(userLocation, carLoc) * 10) / 10f;
                     txtDistance.setText(String.format("📏 %.2f km away", distance));
                 } else {
                     txtDistance.setText("Distance unavailable");
@@ -181,11 +184,10 @@ public class BookingActivity extends BaseActivity {
             Map<String, Object> updates = new HashMap<>();
             updates.put("driverId", userId);
 
-            if (userLocation != null) {
-                updates.put("currentLat", userLocation.latitude);
-                updates.put("currentLng", userLocation.longitude);
+            if (carLocation != null) {
+                updates.put("currentLat", carLocation.latitude);
+                updates.put("currentLng", carLocation.longitude);
             }
-
             tripRef.updateChildren(updates).addOnSuccessListener(unused -> {
 
                 prefs.edit()

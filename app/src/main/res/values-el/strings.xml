@@ -1,121 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- App -->
+    <!-- APP -->
     <string name="app_name">CarSharingApp</string>
+    <string name="app_logo">Λογότυπο εφαρμογής</string>
 
-    <!-- Welcome -->
+    <!-- WELCOME -->
     <string name="find_car">Βρες αυτοκίνητο</string>
     <string name="or">ή</string>
     <string name="login">Σύνδεση</string>
     <string name="register">Εγγραφή</string>
 
-    <!-- Login -->
+    <!-- AUTH -->
     <string name="login_title">Σύνδεση</string>
-    <string name="login_button">Σύνδεση</string>
-
-    <!-- Register -->
     <string name="register_title">Εγγραφή</string>
+    <string name="login_driver">Σύνδεση ως οδηγός</string>
+    <string name="login_passenger">Σύνδεση ως επιβάτης</string>
+    <string name="login_as_label">Σύνδεση ως:</string>
+    <string name="login_as">Σύνδεση ως %1$s</string>
     <string name="register_button">Εγγραφή</string>
+    <string name="no_account_register">Δεν έχεις λογαριασμό; Εγγραφή</string>
+    <string name="register_prompt">Δεν έχεις λογαριασμό; Εγγραφή</string>
 
-    <!-- Form Fields -->
+    <!-- INPUT -->
     <string name="email">Email</string>
     <string name="password">Κωδικός</string>
     <string name="full_name">Ονοματεπώνυμο</string>
     <string name="confirm_password">Επιβεβαίωση κωδικού</string>
 
-    <!-- Validation / Errors -->
-    <string name="error_name_required">Το όνομα είναι υποχρεωτικό</string>
-    <string name="error_email_required">Το email είναι υποχρεωτικό</string>
+    <!-- ERRORS -->
+    <string name="fill_all_fields">Συμπληρώστε όλα τα πεδία</string>
     <string name="error_invalid_email">Εισάγετε έγκυρο email</string>
-    <string name="error_password_required">Ο κωδικός είναι υποχρεωτικός</string>
     <string name="error_password_length">Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες</string>
     <string name="error_password_mismatch">Οι κωδικοί δεν ταιριάζουν</string>
-    <string name="error_no_account">Δεν βρέθηκε λογαριασμός. Κάντε εγγραφή πρώτα.</string>
-    <string name="error_invalid_credentials">Λάθος email ή κωδικός</string>
+    <string name="login_failed">Αποτυχία σύνδεσης</string>
+    <string name="error_loading_trip">Σφάλμα φόρτωσης διαδρομής</string>
+    <string name="registration_failed">Αποτυχία εγγραφής</string>
+    <string name="unexpected_error">Απρόσμενο σφάλμα. Προσπαθήστε ξανά.</string>
+    <string name="email_in_use">Αυτό το email χρησιμοποιείται ήδη</string>
+    <string name="invalid_email_format">Μη έγκυρη μορφή email</string>
+    <string name="weak_password">Ο κωδικός είναι πολύ αδύναμος</string>
+    <string name="network_error">Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας</string>
+    <string name="too_many_requests">Πολλές προσπάθειες. Δοκιμάστε αργότερα</string>
+    <string name="auth_error">Σφάλμα ταυτοποίησης: %1$s</string>
+    <string name="save_user_failed">Αποτυχία αποθήκευσης δεδομένων χρήστη</string>
 
-    <!-- Success Messages -->
-    <string name="login_success">Επιτυχής σύνδεση!</string>
-    <string name="register_success">Επιτυχής εγγραφή!</string>
+    <!-- SUCCESS -->
+    <string name="login_success">Επιτυχής σύνδεση</string>
+    <string name="registration_success">Επιτυχής εγγραφή</string>
+    <string name="creating_account">Δημιουργία λογαριασμού...</string>
 
-    <!-- Map -->
+    <!-- MAP -->
     <string name="view_list">Προβολή λίστας</string>
+    <string name="getting_location">Εύρεση τοποθεσίας...</string>
+    <string name="where_to">Πού θέλετε να πάτε;</string>
+    <string name="confirm_destination">Επιβεβαίωση προορισμού</string>
+    <string name="select_destination">Επιλέξτε προορισμό στον χάρτη</string>
+    <string name="select_destination_first">Επιλέξτε πρώτα προορισμό</string>
+    <string name="route_unavailable">Η διαδρομή δεν είναι διαθέσιμη</string>
+    <string name="location_not_found">Δεν βρέθηκε τοποθεσία</string>
+    <string name="open_in_maps_title">Άνοιγμα στο Google Maps</string>
+    <string name="open_in_maps_message">Θέλετε να ανοίξετε τη διαδρομή στο Google Maps;</string>
+    <string name="yes">Ναι</string>
+    <string name="no">Όχι</string>
+
+    <string name="ride_started">Η διαδρομή ξεκίνησε</string>
+    <string name="ride_ended">Η διαδρομή ολοκληρώθηκε</string>
+    <string name="ride_in_progress">Η διαδρομή είναι σε εξέλιξη</string>
+    <string name="ride_in_progress_short">Σε εξέλιξη</string>
+
+    <string name="selected_location">Επιλεγμένη τοποθεσία</string>
+    <string name="your_car">Το αυτοκίνητό σας</string>
+    <string name="destination">Προορισμός</string>
+    <string name="estimated_price">Εκτιμώμενη τιμή: %1$.2f</string>
+    <string name="end_ride">Τέλος διαδρομής</string>
+
+    <!-- LANGUAGE -->
     <string name="lang_english">Αγγλικά</string>
     <string name="lang_greek">Ελληνικά</string>
 
-    <!-- Car List -->
+    <!-- CAR LIST -->
     <string name="car_list">Λίστα αυτοκινήτων</string>
+    <string name="car_list_desc">Λίστα διαθέσιμων αυτοκινήτων</string>
 
-    <!-- Cars -->
-    <string name="car1_name">Αυτοκίνητο 1</string>
-    <string name="car1_price_value">20€</string>
-    <string name="car1_desc">Άνετο αυτοκίνητο πόλης</string>
+    <string name="sort_hint">Ταξινόμηση...</string>
+    <string name="sort_distance">Ταξινόμηση κατά απόσταση</string>
+    <string name="sort_price">Ταξινόμηση κατά τιμή</string>
 
-    <string name="car2_name">Αυτοκίνητο 2</string>
-    <string name="car2_price_value">25€</string>
-    <string name="car2_desc">Αποδοτική και ομαλή οδήγηση</string>
+    <string-array name="sort_options">
+        <item>@string/sort_hint</item>
+        <item>@string/sort_distance</item>
+        <item>@string/sort_price</item>
+    </string-array>
 
-    <string name="car3_name">Αυτοκίνητο 3</string>
-    <string name="car3_price_value">30€</string>
-    <string name="car3_desc">Πολυτελής εμπειρία οδήγησης</string>
+    <!-- BOOKING -->
+    <string name="start_ride">Έναρξη διαδρομής</string>
+    <string name="join_ride">Συμμετοχή στη διαδρομή</string>
+    <string name="leave_ride">Αποχώρηση από τη διαδρομή</string>
+    <string name="ride_full">Πλήρες</string>
+    <string name="joined_ride">Συμμετείχατε στη διαδρομή</string>
+    <string name="left_ride">Αποχωρήσατε από τη διαδρομή</string>
+    <string name="accept_terms_first">Παρακαλώ αποδεχτείτε τους όρους πρώτα</string>
+    <string name="agree_terms">Συμφωνώ με τους όρους της διαδρομής</string>
 
-    <!-- Price formatting -->
-    <string name="price_per_day">%1$s ανά ημέρα</string>
-    <string name="default_price_value">0€</string>
+    <!-- PROFILE -->
+    <string name="profile_title">Προφίλ</string>
+    <string name="profile">Προφίλ</string>
+    <string name="ride_history">Ιστορικό διαδρομών</string>
+    <string name="logout">Αποσύνδεση</string>
+    <string name="no_name">Χωρίς όνομα</string>
+    <string name="no_email">Χωρίς email</string>
+    <string name="dark_mode">Σκούρο θέμα</string>
 
-    <!-- Car Attributes -->
-    <string name="fuel_petrol">Βενζίνη</string>
-    <string name="fuel_diesel">Πετρέλαιο</string>
-    <string name="transmission_auto">Αυτόματο</string>
-    <string name="transmission_manual">Χειροκίνητο</string>
-
-    <!-- Car Details -->
+    <!-- CAR -->
     <string name="car_name">Όνομα αυτοκινήτου</string>
     <string name="car_description">Περιγραφή</string>
     <string name="features">Χαρακτηριστικά</string>
-
-    <!-- Formatted Features -->
-    <string name="car_features">
-        Θέσεις: %1$d\nΚαύσιμο: %2$s\nΚιβώτιο: %3$s
-    </string>
-
-    <string name="seats">Θέσεις</string>
-    <string name="fuel">Καύσιμο</string>
-    <string name="transmission">Κιβώτιο</string>
-
-    <!-- Defaults -->
-    <string name="unknown_car">Άγνωστο αυτοκίνητο</string>
-    <string name="default_description">Αυτό είναι ένα άνετο και αξιόπιστο αυτοκίνητο διαθέσιμο για χρήση.</string>
-
-    <!-- Accessibility -->
+    <string name="book_now">Κάντε κράτηση</string>
     <string name="car_image">Εικόνα αυτοκινήτου</string>
 
-    <!-- Buttons -->
-    <string name="book_now">Κράτηση</string>
-    <string name="done">Ολοκλήρωση</string>
-    <string name="back_to_map">Επιστροφή στον χάρτη</string>
+    <!-- CAR ATTRIBUTES -->
+    <string name="fuel_petrol">Βενζίνη</string>
+    <string name="fuel_diesel">Πετρέλαιο</string>
+    <string name="fuel_electric">Ηλεκτρικό</string>
+    <string name="fuel_hybrid">Υβριδικό</string>
 
-    <!-- Booking -->
-    <string name="booking_success">Η κράτηση ολοκληρώθηκε επιτυχώς</string>
+    <string name="transmission_auto">Αυτόματο</string>
+    <string name="transmission_manual">Χειροκίνητο</string>
 
-    <string name="booking_message">
-        %1$s\n\nΑυτοκίνητο: %2$s\nΤιμή: %3$s
-    </string>
+    <!-- FORMATTING -->
+    <string name="price_per_km">€%1$.2f / km</string>
+    <string name="price_simple">€%1$.2f</string>
+    <string name="distance_km">%1$.2f km μακριά</string>
+    <string name="distance_unavailable">Η απόσταση δεν είναι διαθέσιμη</string>
+    <string name="seats_available">%1$d διαθέσιμες θέσεις</string>
+    <string name="car_meta">%1$s - %2$.1f</string>
+    <string name="car_specs">%1$s - %2$s - %3$s</string>
+    <string name="rating_format">%1$.1f</string>
 
-    <!-- ===================== -->
-    <!-- Διαδρομές / Ride Sharing -->
-    <!-- ===================== -->
+    <!-- TRIP -->
+    <string name="route_format">%1$s προς %2$s</string>
+    <string name="history_completed">%1$s - %2$.2f</string>
+    <string name="history_active">%1$s - %2$.2f/km</string>
 
-    <string name="trip_created">Η διαδρομή δημιουργήθηκε επιτυχώς!</string>
-    <string name="trip_joined">Συμμετοχή στη διαδρομή!</string>
-    <string name="no_trips">Δεν υπάρχουν διαθέσιμες διαδρομές.</string>
+    <!-- STATUS -->
+    <string name="status_available">Διαθέσιμο</string>
+    <string name="status_in_progress">Σε εξέλιξη</string>
+    <string name="status_completed">Ολοκληρωμένο</string>
 
-    <!-- Πληροφορίες διαδρομής -->
-    <string name="car_label">Αυτοκίνητο: %1$s</string>
-    <string name="seats_label">Θέσεις: %1$d</string>
-    <string name="seats_left">Διαθέσιμες θέσεις: %1$d</string>
-
-    <string name="select_role">Επιλέξτε ρόλο</string>
-    <string name="login_driver">Σύνδεση ως οδηγός</string>
-    <string name="login_passenger">Σύνδεση ως επιβάτης</string>
+    <!-- API -->
+    <string name="google_maps_key">AIzaSyA5JZ3w_M9F62uOy02zE4VM_GkdnItO1es</string>
 
 </resources>

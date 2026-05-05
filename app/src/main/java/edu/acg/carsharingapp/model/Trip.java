@@ -1,7 +1,11 @@
 package edu.acg.carsharingapp.model;
 
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.acg.carsharingapp.R;
 
 public class Trip {
 
@@ -26,10 +30,10 @@ public class Trip {
     private double toLat;
     private double toLng;
 
-    // 🧭 ROUTE (Google Directions encoded polyline)
+    // 🧭 ROUTE
     private String routePolyline;
 
-    // 📍 HUMAN-READABLE ADDRESSES (for UI/history)
+    // 📍 Addresses
     private String fromAddress;
     private String toAddress;
 
@@ -46,14 +50,13 @@ public class Trip {
     private long startedAt;
     private long completedAt;
 
-    // 💰 Final price (after ride)
+    // 💰 Final price
     private double finalPrice;
 
-    // 🔥 Required for Firebase
     public Trip() {}
 
     // =========================
-    // 🏗️ CONSTRUCTOR (AVAILABLE CAR)
+    // 🏗️ CONSTRUCTOR
     // =========================
 
     public Trip(String tripId, double lat, double lng, int seats) {
@@ -112,16 +115,10 @@ public class Trip {
     public double getCurrentLng() { return currentLng; }
     public double getToLat() { return toLat; }
     public double getToLng() { return toLng; }
-
-    public double getFinalPrice() {
-        return finalPrice;
-    }
-
+    public double getFinalPrice() { return finalPrice; }
     public String getRoutePolyline() { return routePolyline; }
-
     public String getFromAddress() { return fromAddress; }
     public String getToAddress() { return toAddress; }
-
     public int getAvailableSeats() { return availableSeats; }
     public String getStatus() { return status; }
     public long getCreatedAt() { return createdAt; }
@@ -144,47 +141,54 @@ public class Trip {
     public void setCurrentLng(double currentLng) { this.currentLng = currentLng; }
     public void setToLat(double toLat) { this.toLat = toLat; }
     public void setToLng(double toLng) { this.toLng = toLng; }
-
     public void setRoutePolyline(String routePolyline) { this.routePolyline = routePolyline; }
-
     public void setFromAddress(String fromAddress) { this.fromAddress = fromAddress; }
     public void setToAddress(String toAddress) { this.toAddress = toAddress; }
-
     public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
     public void setStatus(String status) { this.status = status; }
     public void setStartedAt(long startedAt) { this.startedAt = startedAt; }
     public void setCompletedAt(long completedAt) { this.completedAt = completedAt; }
-
-    public void setFinalPrice(double finalPrice) {
-        this.finalPrice = finalPrice;
-    }
-
-    public void setPassengers(Map<String, Boolean> passengers) {
-        this.passengers = passengers;
-    }
+    public void setFinalPrice(double finalPrice) { this.finalPrice = finalPrice; }
+    public void setPassengers(Map<String, Boolean> passengers) { this.passengers = passengers; }
 
     // =========================
-    // 📦 UI HELPERS
+    // 🌍 UI HELPERS (LOCALIZED)
     // =========================
 
-    public String getSeatsText() {
-        return availableSeats + " seats available";
+    public String getSeatsText(Context context) {
+        return context.getString(R.string.seats_available, availableSeats);
     }
 
-    public String getFormattedPrice() {
-        return String.format("€%.2f", price);
+    public String getFormattedPrice(Context context) {
+        return context.getString(R.string.price_per_km, price);
     }
 
-    public String getHistoryText() {
+    public String getHistoryText(Context context) {
 
-        String routePart = (fromAddress != null && toAddress != null)
-                ? fromAddress + " → " + toAddress
-                : carName;
+        String routePart;
+
+        if (fromAddress != null && toAddress != null) {
+            routePart = context.getString(
+                    R.string.route_format,
+                    fromAddress,
+                    toAddress
+            );
+        } else {
+            routePart = carName;
+        }
 
         if (finalPrice > 0) {
-            return routePart + " • €" + String.format("%.2f", finalPrice);
+            return context.getString(
+                    R.string.history_completed,
+                    routePart,
+                    finalPrice
+            );
         } else {
-            return routePart + " • €" + String.format("%.2f", price) + "/km";
+            return context.getString(
+                    R.string.history_active,
+                    routePart,
+                    price
+            );
         }
     }
 }

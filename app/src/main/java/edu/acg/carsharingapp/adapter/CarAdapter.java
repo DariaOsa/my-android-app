@@ -1,5 +1,6 @@
 package edu.acg.carsharingapp.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,37 +63,40 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
     public void onBindViewHolder(CarViewHolder holder, int position) {
 
         Trip trip = tripList.get(position);
-
-        // 🔗 Get matching Car template
         Car car = CarCatalog.getCarByName(trip.getCarName());
 
         if (car == null) return;
+
+        Context context = holder.itemView.getContext();
 
         // 🚗 NAME
         holder.name.setText(car.getDisplayName());
 
         // ⭐ CATEGORY + RATING
         if (holder.meta != null) {
-            holder.meta.setText(
-                    car.getCategory() + " • ⭐ " + car.getRating()
-            );
+            holder.meta.setText(context.getString(
+                    R.string.car_meta,
+                    car.getCategory(),
+                    car.getRating()
+            ));
         }
 
         // ⚙️ SPECS
         if (holder.details != null) {
-            holder.details.setText(
-                    car.getSeatsText() + " • "
-                            + car.getFuelDisplay() + " • "
-                            + car.getShortTransmission()
-            );
+            holder.details.setText(context.getString(
+                    R.string.car_specs,
+                    car.getSeatsText(context),
+                    car.getFuelDisplay(context),
+                    car.getTransmissionDisplay(context)
+            ));
         }
 
-        // 💶 PRICE (from Trip)
-        holder.price.setText(trip.getFormattedPrice());
+        // 💶 PRICE
+        holder.price.setText(trip.getFormattedPrice(context));
 
-        // 🟢 STATUS
+        // 🟢 STATUS (localized)
         if (holder.status != null) {
-            holder.status.setText(trip.getStatus());
+            holder.status.setText(getStatusText(context, trip.getStatus()));
         }
 
         // 🖼️ IMAGE
@@ -100,23 +104,22 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
             holder.image.setImageResource(car.getImageResId());
         }
 
-        // 📏 DISTANCE (from Trip location)
+        // 📏 DISTANCE
         if (holder.distance != null && userLocation != null) {
-
-            double lat = trip.getCurrentLat();
-            double lng = trip.getCurrentLng();
 
             float[] results = new float[1];
 
             android.location.Location.distanceBetween(
                     userLocation.latitude, userLocation.longitude,
-                    lat, lng,
+                    trip.getCurrentLat(), trip.getCurrentLng(),
                     results
             );
 
             float km = results[0] / 1000f;
 
-            holder.distance.setText(String.format("📏 %.2f km away", km));
+            holder.distance.setText(
+                    context.getString(R.string.distance_km, km)
+            );
         }
 
         // 🔥 CLICK
@@ -125,6 +128,19 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
                 listener.onItemClick(trip);
             }
         });
+    }
+
+    private String getStatusText(Context context, String status) {
+        switch (status) {
+            case Trip.STATUS_AVAILABLE:
+                return context.getString(R.string.status_available);
+            case Trip.STATUS_IN_PROGRESS:
+                return context.getString(R.string.status_in_progress);
+            case Trip.STATUS_COMPLETED:
+                return context.getString(R.string.status_completed);
+            default:
+                return status;
+        }
     }
 
     @Override

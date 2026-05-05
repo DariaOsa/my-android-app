@@ -10,7 +10,7 @@ import edu.acg.carsharingapp.R;
 
 public class WelcomeActivity extends BaseActivity {
 
-    private Button btnFindCar, btnLogin, btnRegister;
+    private Button btnLogin, btnRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +30,9 @@ public class WelcomeActivity extends BaseActivity {
 
         setContentView(R.layout.activity_welcome);
 
+        // 🔘 Buttons
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
-
 
         // 🔐 Login
         btnLogin.setOnClickListener(v ->
@@ -52,8 +52,12 @@ public class WelcomeActivity extends BaseActivity {
         imgGreek.setOnClickListener(v -> setLanguage("el"));
     }
 
+    // 🌍 Apply language globally (FULL restart)
     private void setLanguage(String lang) {
         LocaleHelper.setLocale(this, lang);
-        recreate();
+
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

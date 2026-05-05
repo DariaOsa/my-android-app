@@ -19,7 +19,6 @@ public class LoginActivity extends BaseActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLoginDriver, btnLoginPassenger;
-
     private TextView tvRegister;
 
     private FirebaseAuth mAuth;
@@ -45,7 +44,6 @@ public class LoginActivity extends BaseActivity {
         tvRegister.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class))
         );
-
     }
 
     private void loginUser(String role) {
@@ -54,7 +52,7 @@ public class LoginActivity extends BaseActivity {
         String password = etPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -65,14 +63,17 @@ public class LoginActivity extends BaseActivity {
 
                         String userId = mAuth.getCurrentUser().getUid();
 
-                        // ✅ Save session
                         SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
                         prefs.edit()
                                 .putString("userId", userId)
                                 .putString("role", role)
                                 .apply();
 
-                        Toast.makeText(this, "Login as " + role, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(
+                                this,
+                                getString(R.string.login_as, role),
+                                Toast.LENGTH_SHORT
+                        ).show();
 
                         startActivity(new Intent(LoginActivity.this, MapActivity.class));
                         finish();
@@ -81,7 +82,7 @@ public class LoginActivity extends BaseActivity {
 
                         String error = task.getException() != null
                                 ? task.getException().getMessage()
-                                : "Login failed";
+                                : getString(R.string.login_failed);
 
                         Toast.makeText(this, error, Toast.LENGTH_LONG).show();
                     }

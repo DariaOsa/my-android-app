@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
+import android.view.View;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -48,7 +48,8 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     private LinearLayout rideOverlay, searchCard;
     private TextView txtRideInfo, txtCurrentLocation;
     private EditText edtDestination;
-    private Button btnEndRide, btnViewList, btnConfirmDestination;
+    private Button btnEndRide, btnConfirmDestination;
+    private ImageButton btnViewList;
 
     private ImageButton btnProfile;
 
@@ -84,19 +85,29 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         btnEndRide = findViewById(R.id.btnEndRide);
         btnViewList = findViewById(R.id.btnViewList);
         btnProfile = findViewById(R.id.btnProfile);
-        btnProfile.bringToFront();
 
-        btnProfile.setOnClickListener(v -> {
-            startActivity(new Intent(MapActivity.this, ProfileActivity.class));
-        });
-
-        searchCard.setVisibility(View.GONE);
+        btnProfile.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileActivity.class)));
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "YOUR_API_KEY");
+            Places.initialize(getApplicationContext(),
+                    getString(R.string.google_maps_key));
         }
 
+        // 🔍 Autocomplete on click (optional UX)
         edtDestination.setOnClickListener(v -> openAutocomplete());
+
+// ⌨️ Manual typing support
+        edtDestination.setOnEditorActionListener((v, actionId, event) -> {
+
+            String text = edtDestination.getText().toString().trim();
+
+            if (!text.isEmpty()) {
+                handleTypedAddress(text);
+            }
+
+            return true;
+        });
 
         btnViewList.setOnClickListener(v ->
                 startActivity(new Intent(this, CarListActivity.class)));
@@ -110,25 +121,15 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
         tripsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                if (!snapshot.exists()) {
-                    seedTripsOnce();
-                }
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) seedTripsOnce();
             }
-
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
-    // =========================
-    // 🌱 SEED
-    // =========================
     private void seedTripsOnce() {
-
         for (Car car : CarCatalog.getCars()) {
-
             String id = tripsRef.push().getKey();
 
             double lat = 37.9838 + (Math.random() - 0.5) * 0.05;
@@ -146,19 +147,19 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        enableMyLocation();
+        enableMyLocation();       // 🔴 first
         fetchUserLocation();
 
-        refreshUI();
-    }
+        // ✅ THEN disable Google UI buttons
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         refreshUI();
     }
 
     private void refreshUI() {
+
         if (mMap == null) return;
 
         if (tripsListener != null) tripsRef.removeEventListener(tripsListener);
@@ -167,15 +168,14 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         String activeTrip = prefs.getString("activeTripId", null);
         boolean pickingDestination = prefs.getBoolean("pickingDestination", false);
+        Log.d("MAP_DEBUG", "activeTrip=" + activeTrip + " picking=" + pickingDestination);
 
-        // ✅ Profile button visibility
         if (activeTrip != null) {
             btnProfile.setVisibility(View.GONE);
         } else {
             btnProfile.setVisibility(View.VISIBLE);
         }
 
-        // ✅ Main UI logic (ONLY ONCE)
         if (activeTrip != null && pickingDestination) {
             searchCard.setVisibility(View.VISIBLE);
             enableDestinationPicking(activeTrip);
@@ -189,6 +189,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             showBrowsingMode();
         }
     }
+
     private void showBrowsingMode() {
 
         rideOverlay.setVisibility(View.GONE);
@@ -200,11 +201,20 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                 mMap.clear();
 
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                boolean hasMarkers = false;
+
+// 🔵 include user location
+                if (userLocation != null) {
+                    builder.include(userLocation);
+                }
+
                 for (DataSnapshot snap : snapshot.getChildren()) {
 
                     Trip trip = snap.getValue(Trip.class);
                     if (trip == null) continue;
 
+                    // 🔥 ROLE FILTERING (THIS is what you were missing)
                     boolean show;
 
                     if ("DRIVER".equals(role)) {
@@ -228,7 +238,26 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                             .title(trip.getCarName()));
 
                     if (m != null) m.setTag(trip.getTripId());
+
+                    // ✅ include in camera bounds
+                    builder.include(pos);
+                    hasMarkers = true;
                 }
+                if (hasMarkers) {
+                    LatLngBounds bounds = builder.build();
+
+                    mMap.setOnMapLoadedCallback(() ->
+                            mMap.animateCamera(
+                                    CameraUpdateFactory.newLatLngBounds(bounds, 150)
+                            )
+                    );
+                } else if (userLocation != null) {
+                    mMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(userLocation, 14)
+                    );
+                }
+
+
                 mMap.setOnMarkerClickListener(marker -> {
 
                     LatLng carPosition = marker.getPosition();
@@ -236,78 +265,26 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                     Intent i = new Intent(MapActivity.this, BookingActivity.class);
                     i.putExtra("tripId", tripId);
-
-                    // ✅ PASS CAR POSITION
-                    // 🚗 car location
                     i.putExtra("carLat", carPosition.latitude);
                     i.putExtra("carLng", carPosition.longitude);
 
-// 📱 user location (real distance reference)
                     if (userLocation != null) {
                         i.putExtra("userLat", userLocation.latitude);
                         i.putExtra("userLng", userLocation.longitude);
                     }
 
                     startActivity(i);
-
                     return true;
                 });
-
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                boolean hasMarkers = false;
-
-                for (DataSnapshot snap : snapshot.getChildren()) {
-
-                    Trip trip = snap.getValue(Trip.class);
-                    if (trip == null) continue;
-
-                    boolean show;
-
-                    if ("DRIVER".equals(role)) {
-                        show = trip.isAvailable();
-                    } else {
-                        show = trip.isInProgress()
-                                && trip.getDriverId() != null
-                                && !trip.getDriverId().equals(userId)
-                                && trip.getAvailableSeats() > 0;
-                    }
-
-                    if (!show) continue;
-
-                    LatLng pos = new LatLng(
-                            trip.getCurrentLat(),
-                            trip.getCurrentLng()
-                    );
-
-                    Marker m = mMap.addMarker(new MarkerOptions()
-                            .position(pos)
-                            .title(trip.getCarName()));
-
-                    if (m != null) m.setTag(trip.getTripId());
-
-                    // ✅ include in bounds
-                    builder.include(pos);
-                    hasMarkers = true;
-                }
-
-// ✅ AFTER loop → zoom to ALL cars
-                if (hasMarkers) {
-                    LatLngBounds bounds = builder.build();
-
-                    mMap.setOnMapLoadedCallback(() ->
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150)));
-                }
             }
 
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
-    // =========================
-    // 🎯 DESTINATION PICK (FIXED)
-    // =========================
     private void enableDestinationPicking(String tripId) {
         if (mMap == null) return;
+
         mMap.clear();
 
         tripsRef.child(tripId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -318,22 +295,32 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                 if (trip == null) return;
 
                 LatLng car = new LatLng(trip.getCurrentLat(), trip.getCurrentLng());
-                // ✅ Show car location instead of user GPS
+
+                // 🔹 show address
                 new Thread(() -> {
                     String addr = getAddressFromLatLng(car);
                     runOnUiThread(() -> txtCurrentLocation.setText(addr));
                 }).start();
 
-                mMap.addMarker(new MarkerOptions().position(car).title("Your Car"));
+                // 🔹 car marker
+                mMap.addMarker(new MarkerOptions()
+                        .position(car)
+                        .title(getString(R.string.your_car)));
+
+                // 🔥 THIS WAS MISSING → zoom
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(car, 15));
 
                 btnConfirmDestination.setOnClickListener(v -> {
 
                     if (selectedDestination == null) {
-                        Toast.makeText(MapActivity.this,
-                                "Select destination first",
-                                Toast.LENGTH_SHORT).show();
-                        return;
+                        selectedDestination = tryGetDestinationFromText();
+
+                        if (selectedDestination == null) {
+                            Toast.makeText(MapActivity.this,
+                                    getString(R.string.select_destination_first),
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
 
                     btnConfirmDestination.setEnabled(false);
@@ -356,7 +343,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                             .apply();
 
                     Toast.makeText(MapActivity.this,
-                            "Ride started!",
+                            getString(R.string.ride_started),
                             Toast.LENGTH_SHORT).show();
 
                     refreshUI();
@@ -374,21 +361,21 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                             mMap.clear();
 
-                            // 🚗 Car marker ALWAYS shows
                             mMap.addMarker(new MarkerOptions()
                                     .position(car)
-                                    .title("Your Car"));
+                                    .title(getString(R.string.your_car)));
 
-                            // 📍 Destination marker ALWAYS shows
+                            if (destinationMarker != null) {
+                                destinationMarker.remove();
+                            }
+
                             destinationMarker = mMap.addMarker(new MarkerOptions()
                                     .position(dest)
-                                    .draggable(true)
-                                    .title("Destination"));
+                                    .title(getString(R.string.destination)));
 
-                            // 📝 Address ALWAYS fills
                             edtDestination.setText(getAddressFromLatLng(dest));
+                            askOpenInMaps(car, dest);
 
-                            // 🧭 Draw route ONLY if available
                             if (route != null && !route.isEmpty()) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .addAll(route)
@@ -396,41 +383,31 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                                         .color(0xFF2196F3));
                             } else {
                                 Toast.makeText(MapActivity.this,
-                                        "Route unavailable",
+                                        getString(R.string.route_unavailable),
                                         Toast.LENGTH_SHORT).show();
                             }
+
                             double distanceKm = calculateRouteDistanceKm(route);
+                            double price = trip.getPrice() * distanceKm;
 
-// get price per km from trip
-                            double pricePerKm = trip.getPrice();
+                            Toast.makeText(MapActivity.this,
+                                    getString(R.string.estimated_price, price),
+                                    Toast.LENGTH_LONG).show();
 
-                            double estimatedPrice = pricePerKm * distanceKm;
-
-                            runOnUiThread(() -> {
-                                Toast.makeText(MapActivity.this,
-                                        String.format("Estimated price: €%.2f", estimatedPrice),
-                                        Toast.LENGTH_LONG).show();
-                            });
-
+                            // 🔥 zoom to full route
                             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-// Always include key points
                             builder.include(car);
                             builder.include(dest);
 
-// Include full route (CRITICAL)
-                            if (route != null && !route.isEmpty()) {
-                                for (LatLng p : route) {
-                                    builder.include(p);
-                                }
+                            if (route != null) {
+                                for (LatLng p : route) builder.include(p);
                             }
 
                             LatLngBounds bounds = builder.build();
 
-// Wait for map layout before applying bounds
-                            mMap.setOnMapLoadedCallback(() -> {
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
-                            });
+                            mMap.setOnMapLoadedCallback(() ->
+                                    mMap.animateCamera(
+                                            CameraUpdateFactory.newLatLngBounds(bounds, 200)));
                         });
 
                     }).start();
@@ -440,9 +417,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
-    // =========================
-// 🚗 RIDE MODE (RESTORED)
-// =========================
+
     private void showRideMode(String tripId) {
 
         currentRideTripId = tripId;
@@ -464,7 +439,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                         trip.getCurrentLng()
                 );
 
-                // ✅ Update location label to car position
+                // ✅ update location text
                 new Thread(() -> {
                     String addr = getAddressFromLatLng(from);
                     runOnUiThread(() -> txtCurrentLocation.setText(addr));
@@ -474,30 +449,55 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                         trip.getToLat(),
                         trip.getToLng()
                 );
+
                 selectedDestination = to;
 
                 new Thread(() -> {
+
                     List<LatLng> route = getRouteFromApi(from, to);
 
                     runOnUiThread(() -> {
 
                         mMap.clear();
 
-                        mMap.addPolyline(new PolylineOptions()
-                                .addAll(route)
-                                .width(10f)
-                                .color(0xFF2196F3));
-
                         if (route != null && !route.isEmpty()) {
+
+                            // ✅ draw route
+                            mMap.addPolyline(new PolylineOptions()
+                                    .addAll(route)
+                                    .width(10f)
+                                    .color(0xFF2196F3));
+
+                            // 🔥 THIS IS CRITICAL → animation
                             startCarAnimation(route);
+
                         } else {
                             Toast.makeText(MapActivity.this,
-                                    "Route unavailable",
+                                    getString(R.string.route_unavailable),
                                     Toast.LENGTH_SHORT).show();
                         }
 
-                        txtRideInfo.setText("🚗 Ride in progress: " + trip.getCarName());
+                        // ✅ ride text
+                        txtRideInfo.setText(
+                                getString(R.string.ride_in_progress) + ": " + trip.getCarName()
+                        );
+
+                        // ✅ zoom to route
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        builder.include(from);
+                        builder.include(to);
+
+                        if (route != null) {
+                            for (LatLng p : route) builder.include(p);
+                        }
+
+                        LatLngBounds bounds = builder.build();
+
+                        mMap.setOnMapLoadedCallback(() ->
+                                mMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngBounds(bounds, 200)));
                     });
+
                 }).start();
             }
 
@@ -506,9 +506,6 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         });
     }
 
-    // =========================
-    // 🛑 END RIDE
-    // =========================
     private void endRide() {
 
         if (currentRideTripId == null) return;
@@ -538,7 +535,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                                 distanceKm = calculateRouteDistanceKm(route);
                             }
 
-                            // 🔥 fallback (important)
+                            // fallback distance
                             if (distanceKm == 0) {
                                 float[] results = new float[1];
                                 android.location.Location.distanceBetween(
@@ -552,16 +549,26 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                             double finalPrice = trip.getPrice() * distanceKm;
                             trip.setFinalPrice(finalPrice);
 
+// ✅ FIX 1: mark as completed
+                            trip.setStatus(Trip.STATUS_COMPLETED);
+                            trip.setCompletedAt(System.currentTimeMillis());
+
+// ✅ FIX 2: save real addresses
+                            String fromAddress = getAddressFromLatLng(from);
+                            String toAddress = getAddressFromLatLng(to);
+
+                            trip.setFromAddress(fromAddress);
+                            trip.setToAddress(toAddress);
+
                             runOnUiThread(() -> {
 
-                                // ✅ SAVE HISTORY FIRST
+                                // ✅ save history
                                 String historyId = historyRef.push().getKey();
                                 historyRef.child(historyId).setValue(trip);
 
-                                // ✅ THEN RESET TRIP
+                                // ✅ reset trip
                                 Map<String, Object> updates = new HashMap<>();
 
-                                // keep final location (important)
                                 if (selectedDestination != null) {
                                     updates.put("currentLat", selectedDestination.latitude);
                                     updates.put("currentLng", selectedDestination.longitude);
@@ -575,7 +582,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                                 tripsRef.child(currentRideTripId).updateChildren(updates);
 
-                                // ✅ session cleanup
+                                // ✅ CLEAR SESSION (CRITICAL)
                                 getSharedPreferences("session", MODE_PRIVATE)
                                         .edit()
                                         .remove("activeTripId")
@@ -584,12 +591,14 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
                                 currentRideTripId = null;
 
+                                // ✅ STOP animation
                                 stopCarAnimation();
 
                                 Toast.makeText(MapActivity.this,
-                                        "Ride ended",
+                                        getString(R.string.ride_ended),
                                         Toast.LENGTH_SHORT).show();
 
+                                // 🔥 THIS WAS MISSING
                                 refreshUI();
                             });
 
@@ -601,21 +610,14 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                 });
     }
 
-    // =========================
-    // 📍 LOCATION
-    // =========================
     private void enableMyLocation() {
         if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == android.content.pm.PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
-        } else {
-            requestPermissions(
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
         }
     }
 
     private void fetchUserLocation() {
-
         FusedLocationProviderClient client =
                 LocationServices.getFusedLocationProviderClient(this);
 
@@ -625,35 +627,8 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         client.getLastLocation().addOnSuccessListener(location -> {
             if (location != null) {
                 userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                updateCurrentLocationUI();
             }
         });
-    }
-
-    private void updateCurrentLocationUI() {
-
-        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
-        String activeTrip = prefs.getString("activeTripId", null);
-        boolean pickingDestination = prefs.getBoolean("pickingDestination", false);
-
-        // ❌ DO NOT override when using car
-        if (activeTrip != null) return;
-
-        new Thread(() -> {
-            String addr = getAddressFromLatLng(userLocation);
-            runOnUiThread(() -> txtCurrentLocation.setText(addr));
-        }).start();
-    }
-
-    private String getAddressFromLatLng(LatLng latLng) {
-        try {
-            android.location.Geocoder g =
-                    new android.location.Geocoder(this, Locale.getDefault());
-            List<android.location.Address> a =
-                    g.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            if (a != null && !a.isEmpty()) return a.get(0).getAddressLine(0);
-        } catch (Exception ignored) {}
-        return "Selected location";
     }
 
     private void openAutocomplete() {
@@ -669,45 +644,127 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         startActivityForResult(intent, 100);
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-
-            Place place = Autocomplete.getPlaceFromIntent(data);
-
-            LatLng dest = place.getLatLng();
-            edtDestination.setText(place.getName());
-
-            showPreviewRoute(dest);
-        }
-    }
-
-    private void showPreviewRoute(LatLng destination) {
-
-        if (userLocation == null) return;
+    private void handleTypedAddress(String addressText) {
 
         new Thread(() -> {
-            List<LatLng> route = getRouteFromApi(userLocation, destination);
 
-            runOnUiThread(() -> {
+            try {
+                android.location.Geocoder geocoder =
+                        new android.location.Geocoder(this, Locale.getDefault());
 
-                mMap.clear();
+                List<android.location.Address> results =
+                        geocoder.getFromLocationName(addressText, 1);
 
-                mMap.addMarker(new MarkerOptions().position(userLocation));
-                mMap.addMarker(new MarkerOptions().position(destination));
+                if (results != null && !results.isEmpty()) {
 
-                mMap.addPolyline(new PolylineOptions()
-                        .addAll(route)
-                        .width(10f)
-                        .color(0xFF2196F3));
-            });
-        }).start();
+                    LatLng dest = new LatLng(
+                            results.get(0).getLatitude(),
+                            results.get(0).getLongitude()
+                    );
+
+                    selectedDestination = dest;
+
+                    runOnUiThread(() -> drawRouteManually(dest));
+
+                } else {
+                    runOnUiThread(() ->
+                            Toast.makeText(this,
+                                    getString(R.string.location_not_found),
+                                    Toast.LENGTH_SHORT).show());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }).start(); // ✅
     }
 
+    private void drawRouteManually(LatLng dest) {
+
+        SharedPreferences prefs = getSharedPreferences("session", MODE_PRIVATE);
+        String tripId = prefs.getString("activeTripId", null);
+
+        if (tripId == null) return;
+
+        tripsRef.child(tripId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        Trip trip = snapshot.getValue(Trip.class);
+                        if (trip == null) return;
+
+                        LatLng car = new LatLng(trip.getCurrentLat(), trip.getCurrentLng());
+                        selectedDestination = dest;
+
+                        new Thread(() -> {
+
+                            List<LatLng> route = getRouteFromApi(car, dest);
+
+                            runOnUiThread(() -> {
+
+                                mMap.clear();
+
+// 🚗 Car marker
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(car)
+                                        .title(getString(R.string.your_car)));
+
+// 📍 Destination marker
+                                destinationMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(dest)
+                                        .title(getString(R.string.destination)));
+
+// 📝 Update text
+                                edtDestination.setText(getAddressFromLatLng(dest));
+
+// 🗺️ Draw route
+                                if (route != null && !route.isEmpty()) {
+                                    mMap.addPolyline(new PolylineOptions()
+                                            .addAll(route)
+                                            .width(10f)
+                                            .color(0xFF2196F3));
+                                }
+
+// 💰 Show price
+                                double distanceKm = calculateRouteDistanceKm(route);
+                                double price = trip.getPrice() * distanceKm;
+
+                                Toast.makeText(MapActivity.this,
+                                        getString(R.string.estimated_price, price),
+                                        Toast.LENGTH_LONG).show();
+
+                                // 🧭 Zoom to route
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                builder.include(car);
+                                builder.include(dest);
+
+                                if (route != null) {
+                                    for (LatLng p : route) builder.include(p);
+                                }
+
+
+
+
+
+                            });
+
+                        }).start();
+                    }
+
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+    private void redirectToLogin() {
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
+    }
+    // =========================
+// 🌐 ROUTE API
+// =========================
     private List<LatLng> getRouteFromApi(LatLng origin, LatLng destination) {
 
         List<LatLng> path = new ArrayList<>();
@@ -716,7 +773,7 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             String urlStr = "https://maps.googleapis.com/maps/api/directions/json?"
                     + "origin=" + origin.latitude + "," + origin.longitude
                     + "&destination=" + destination.latitude + "," + destination.longitude
-                    + "&key=AIzaSyA5JZ3w_M9F62uOy02zE4VM_GkdnItO1es";
+                    + "&key=" + getString(R.string.google_maps_key);
 
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -743,6 +800,9 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         return path;
     }
 
+    // =========================
+// 🔓 POLYLINE DECODER
+// =========================
     private List<LatLng> decodePolyline(String encoded) {
 
         List<LatLng> poly = new ArrayList<>();
@@ -776,7 +836,14 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
 
         return poly;
     }
+
+    // =========================
+// 📏 DISTANCE
+// =========================
     private double calculateRouteDistanceKm(List<LatLng> route) {
+
+        if (route == null || route.size() < 2) return 0;
+
         double distance = 0;
 
         for (int i = 0; i < route.size() - 1; i++) {
@@ -788,13 +855,62 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
                     results
             );
 
-            distance += results[0]; // meters
+            distance += results[0];
         }
 
-        return distance / 1000.0; // km
+        return distance / 1000.0;
+    }
+    private void openInGoogleMaps(LatLng from, LatLng to) {
+
+        String uri = "https://www.google.com/maps/dir/?api=1"
+                + "&origin=" + from.latitude + "," + from.longitude
+                + "&destination=" + to.latitude + "," + to.longitude
+                + "&travelmode=driving";
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+
+        startActivity(intent);
+    }
+    private void askOpenInMaps(LatLng from, LatLng to) {
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(getString(R.string.open_in_maps_title))
+                .setMessage(getString(R.string.open_in_maps_message))
+                .setPositiveButton(getString(R.string.yes), (dialog, which) -> {
+                    openInGoogleMaps(from, to);
+                })
+                .setNegativeButton(getString(R.string.no), null)
+                .show();
     }
 
+    // =========================
+// 📍 ADDRESS
+// =========================
+    private String getAddressFromLatLng(LatLng latLng) {
+
+        try {
+            android.location.Geocoder g =
+                    new android.location.Geocoder(this, Locale.getDefault());
+
+            List<android.location.Address> a =
+                    g.getFromLocation(latLng.latitude, latLng.longitude, 1);
+
+            if (a != null && !a.isEmpty()) {
+                android.location.Address addr = a.get(0);
+                return addr.getThoroughfare() + ", " + addr.getLocality();
+            }
+
+        } catch (Exception ignored) {}
+
+        return getString(R.string.selected_location);
+    }
+
+    // =========================
+// 🚗 CAR ANIMATION
+// =========================
     private void startCarAnimation(List<LatLng> route) {
+
         if (route == null || route.size() < 2) return;
 
         stopCarAnimation();
@@ -836,12 +952,24 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
             float smooth = smoothRotation(carMarker.getRotation(), bearing);
             carMarker.setRotation(smooth);
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(newPos));
+            // 🔥 camera follows the car
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(newPos)
+                    .zoom(17f)
+                    .tilt(45f)   // 🔥 adds perspective
+                    .build();
+
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         });
 
         carAnimator.start();
     }
+
+    // =========================
+// 📐 BEARING
+// =========================
     private float getBearing(LatLng start, LatLng end) {
+
         double lat = Math.abs(start.latitude - end.latitude);
         double lng = Math.abs(start.longitude - end.longitude);
 
@@ -857,21 +985,47 @@ public class MapActivity extends BaseActivity implements OnMapReadyCallback {
         return 0;
     }
 
+    // =========================
+// 🔄 ROTATION SMOOTHING
+// =========================
     private float smoothRotation(float start, float end) {
+
         float diff = end - start;
+
         if (Math.abs(diff) > 180) {
             if (diff > 0) start += 360;
             else end += 360;
         }
+
         return start + (end - start);
     }
+    private LatLng tryGetDestinationFromText() {
 
-    private void stopCarAnimation() {
-        if (carAnimator != null) carAnimator.cancel();
+        String text = edtDestination.getText().toString();
+
+        try {
+            android.location.Geocoder geocoder =
+                    new android.location.Geocoder(this, Locale.getDefault());
+
+            List<android.location.Address> results =
+                    geocoder.getFromLocationName(text, 1);
+
+            if (results != null && !results.isEmpty()) {
+                return new LatLng(
+                        results.get(0).getLatitude(),
+                        results.get(0).getLongitude()
+                );
+            }
+
+        } catch (Exception ignored) {}
+
+        return null;
     }
 
-    private void redirectToLogin() {
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
+    // =========================
+// ⛔ STOP ANIMATION
+// =========================
+    private void stopCarAnimation() {
+        if (carAnimator != null) carAnimator.cancel();
     }
 }

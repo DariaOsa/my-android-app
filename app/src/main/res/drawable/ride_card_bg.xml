@@ -1,4 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+
     <corners android:radius="20dp"/>
-    <solid android:color="#FFFFFF"/>
+
+    <!-- ✅ dynamic background -->
+    <solid android:color="?attr/colorSurface"/>
+
+    <!-- ✅ dynamic border -->
+    <stroke
+        android:width="1dp"
+        android:color="?attr/colorOnSurface"/>
+
 </shape>

@@ -3,12 +3,16 @@ package edu.acg.carsharingapp.ui;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
@@ -36,9 +40,7 @@ public class CarListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_list);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        setupToolbar(); // ✅ added
 
         recyclerView = findViewById(R.id.recyclerCars);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -49,23 +51,77 @@ public class CarListActivity extends BaseActivity {
 
         tripsRef = FirebaseDatabase.getInstance().getReference("trips");
 
-        Button btnSortDistance = findViewById(R.id.btnSortDistance);
-        Button btnSortPrice = findViewById(R.id.btnSortPrice);
-
-        if (btnSortDistance != null && btnSortPrice != null) {
-
-            btnSortDistance.setOnClickListener(v -> {
-                sortMode = "DISTANCE";
-                loadTrips();
-            });
-
-            btnSortPrice.setOnClickListener(v -> {
-                sortMode = "PRICE";
-                loadTrips();
-            });
-        }
+        setupSpinner(); // ✅ extracted clean method
 
         fetchUserLocationAndLoad();
+    }
+
+    // =========================
+    // 🧭 TOOLBAR
+    // =========================
+
+    private void setupToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.app_name));
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(getString(R.string.app_name)); // ✅ FIXED
+        }
+    }
+
+    // =========================
+    // 🔽 SPINNER
+    // =========================
+
+    private void setupSpinner() {
+        Spinner spinnerSort = findViewById(R.id.spinnerSort);
+
+        if (spinnerSort == null) return;
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.sort_options,
+                android.R.layout.simple_spinner_item
+        );
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSort.setAdapter(adapter);
+
+        spinnerSort.post(() -> {
+            TextView tv = (TextView) spinnerSort.getSelectedView();
+            if (tv != null) {
+                tv.setTextColor(android.graphics.Color.BLACK);
+                tv.setTextSize(16f);
+            }
+        });
+
+        spinnerSort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
+
+                TextView tv = (TextView) parent.getChildAt(0);
+                if (tv != null) {
+                    tv.setTextColor(android.graphics.Color.BLACK);
+                }
+
+                if (position == 1) {
+                    sortMode = "DISTANCE";
+                } else if (position == 2) {
+                    sortMode = "PRICE";
+                } else {
+                    return;
+                }
+
+                if (userLocation != null) {
+                    loadTrips();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
     // =========================
@@ -91,7 +147,6 @@ public class CarListActivity extends BaseActivity {
 
             if (location != null) {
                 userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                loadTrips();
 
             } else {
                 client.getCurrentLocation(
@@ -107,7 +162,10 @@ public class CarListActivity extends BaseActivity {
 
                     loadTrips();
                 });
+                return;
             }
+
+            loadTrips();
         });
     }
 
@@ -146,10 +204,8 @@ public class CarListActivity extends BaseActivity {
                     boolean show;
 
                     if ("DRIVER".equals(role)) {
-                        // Driver sees available cars
                         show = Trip.STATUS_AVAILABLE.equals(trip.getStatus());
                     } else {
-                        // Passenger sees active rides (not their own)
                         show = Trip.STATUS_IN_PROGRESS.equals(trip.getStatus())
                                 && trip.getDriverId() != null
                                 && !trip.getDriverId().equals(userId)
@@ -161,16 +217,12 @@ public class CarListActivity extends BaseActivity {
                     filteredTrips.add(trip);
                 }
 
-                // =========================
-                // 🔥 SORTING
-                // =========================
-
                 if ("PRICE".equals(sortMode)) {
 
                     Collections.sort(filteredTrips, (a, b) ->
                             Double.compare(a.getPrice(), b.getPrice()));
 
-                } else {
+                } else if (userLocation != null) {
 
                     Collections.sort(filteredTrips, (a, b) -> {
 
@@ -184,10 +236,6 @@ public class CarListActivity extends BaseActivity {
                     });
                 }
 
-                // =========================
-                // 🔗 ADAPTER
-                // =========================
-
                 CarAdapter adapter = new CarAdapter(
                         filteredTrips,
                         userLocation,
@@ -196,8 +244,11 @@ public class CarListActivity extends BaseActivity {
                             Intent intent = new Intent(CarListActivity.this, BookingActivity.class);
 
                             intent.putExtra("tripId", trip.getTripId());
-                            intent.putExtra("userLat", userLocation.latitude);
-                            intent.putExtra("userLng", userLocation.longitude);
+
+                            if (userLocation != null) {
+                                intent.putExtra("userLat", userLocation.latitude);
+                                intent.putExtra("userLng", userLocation.longitude);
+                            }
 
                             startActivity(intent);
                         }
@@ -217,6 +268,8 @@ public class CarListActivity extends BaseActivity {
 
     private float getDistanceKm(LatLng a, LatLng b) {
 
+        if (a == null || b == null) return 0;
+
         float[] results = new float[1];
 
         android.location.Location.distanceBetween(
@@ -228,7 +281,6 @@ public class CarListActivity extends BaseActivity {
         return results[0] / 1000f;
     }
 
-    // 🔙 Back
     @Override
     public boolean onSupportNavigateUp() {
         finish();

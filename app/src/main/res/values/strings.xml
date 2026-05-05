@@ -1,121 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- App -->
+    <!-- APP -->
     <string name="app_name">CarSharingApp</string>
+    <string name="app_logo">App logo</string>
 
-    <!-- Welcome -->
+    <!-- WELCOME -->
     <string name="find_car">Find a Car</string>
     <string name="or">or</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
 
-    <!-- Login -->
+
+    <!-- AUTH -->
     <string name="login_title">Login</string>
-    <string name="login_button">Login</string>
-
-    <!-- Register -->
     <string name="register_title">Register</string>
+    <string name="login_driver">Login as Driver</string>
+    <string name="login_passenger">Login as Passenger</string>
+    <string name="login_as_label">Login as:</string>
+    <string name="login_as">Login as %1$s</string>
     <string name="register_button">Register</string>
+    <string name="no_account_register">Dont have an account? Register</string>
+    <string name="register_prompt">Dont have an account? Register</string>
 
-    <!-- Form Fields -->
+    <!-- INPUT -->
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="full_name">Full Name</string>
     <string name="confirm_password">Confirm Password</string>
 
-    <!-- Validation / Errors -->
-    <string name="error_name_required">Name is required</string>
-    <string name="error_email_required">Email is required</string>
+    <!-- ERRORS -->
+    <string name="fill_all_fields">Please fill all fields</string>
     <string name="error_invalid_email">Enter a valid email</string>
-    <string name="error_password_required">Password is required</string>
     <string name="error_password_length">Password must be at least 6 characters</string>
     <string name="error_password_mismatch">Passwords do not match</string>
-    <string name="error_no_account">No account found. Please register first.</string>
-    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="login_failed">Login failed</string>
+    <string name="error_loading_trip">Error loading trip</string>
+    <string name="registration_failed">Registration failed</string>
+    <string name="unexpected_error">Unexpected error. Try again.</string>
+    <string name="email_in_use">This email is already registered</string>
+    <string name="invalid_email_format">Invalid email format</string>
+    <string name="weak_password">Password is too weak</string>
+    <string name="network_error">Network error. Check your connection</string>
+    <string name="too_many_requests">Too many attempts. Try again later</string>
+    <string name="auth_error">Auth error: %1$s</string>
+    <string name="save_user_failed">Failed to save user data</string>
 
-    <!-- Success Messages -->
-    <string name="login_success">Login successful!</string>
-    <string name="register_success">Registered successfully!</string>
+    <!-- SUCCESS -->
+    <string name="login_success">Login successful</string>
+    <string name="registration_success">Registration successful</string>
+    <string name="creating_account">Creating account...</string>
 
-    <!-- Map -->
+    <!-- MAP -->
     <string name="view_list">View List</string>
+    <string name="getting_location">Getting your location...</string>
+    <string name="where_to">Where to?</string>
+    <string name="confirm_destination">Confirm Destination</string>
+    <string name="select_destination">Select destination on map</string>
+    <string name="select_destination_first">Select destination first</string>
+    <string name="route_unavailable">Route unavailable</string>
+    <string name="location_not_found">Location not found</string>
+    <string name="open_in_maps_title">Open in Google Maps</string>
+    <string name="open_in_maps_message">Do you want to open this route in Google Maps?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="ride_started">Ride started</string>
+    <string name="ride_ended">Ride ended</string>
+    <string name="ride_in_progress">Ride in progress</string>
+    <string name="ride_in_progress_short">Ride in progress</string>
+
+    <string name="selected_location">Selected location</string>
+    <string name="your_car">Your Car</string>
+    <string name="destination">Destination</string>
+    <string name="estimated_price">Estimated price: %1$.2f</string>
+    <string name="end_ride">End Ride</string>
+
+    <!-- LANGUAGE -->
     <string name="lang_english">English</string>
     <string name="lang_greek">Greek</string>
 
-    <!-- Car List -->
+    <!-- CAR LIST -->
     <string name="car_list">Car List</string>
+    <string name="car_list_desc">List of available cars</string>
 
-    <!-- Cars -->
-    <string name="car1_name">Car 1</string>
-    <string name="car1_price_value">€20</string>
-    <string name="car1_desc">Comfortable city car</string>
+    <string name="sort_hint">Sort by...</string>
+    <string name="sort_distance">Sort by Distance</string>
+    <string name="sort_price">Sort by Price</string>
 
-    <string name="car2_name">Car 2</string>
-    <string name="car2_price_value">€25</string>
-    <string name="car2_desc">Efficient and smooth ride</string>
+    <string-array name="sort_options">
+        <item>@string/sort_hint</item>
+        <item>@string/sort_distance</item>
+        <item>@string/sort_price</item>
+    </string-array>
 
-    <string name="car3_name">Car 3</string>
-    <string name="car3_price_value">€30</string>
-    <string name="car3_desc">Luxury experience vehicle</string>
+    <!-- BOOKING -->
+    <string name="start_ride">Start Ride</string>
+    <string name="join_ride">Join Ride</string>
+    <string name="leave_ride">Leave Ride</string>
+    <string name="ride_full">Full</string>
+    <string name="joined_ride">Joined ride</string>
+    <string name="left_ride">Left ride</string>
+    <string name="accept_terms_first">Please accept terms first</string>
+    <string name="agree_terms">I agree to ride conditions</string>
 
-    <!-- Price formatting -->
-    <string name="price_per_day">%1$s/day</string>
-    <string name="default_price_value">€0</string>
+    <!-- PROFILE -->
+    <string name="profile_title">Profile</string>
+    <string name="profile">Profile</string>
+    <string name="ride_history">Ride History</string>
+    <string name="logout">Logout</string>
+    <string name="no_name">No name</string>
+    <string name="no_email">No email</string>
+    <string name="dark_mode">Dark mode</string>
 
-    <!-- Car Attributes -->
+    <!-- CAR -->
+    <string name="car_name">Car Name</string>
+    <string name="car_description">Description</string>
+    <string name="features">Features</string>
+    <string name="book_now">Book Now</string>
+    <string name="car_image">Car image</string>
+
+    <!-- CAR ATTRIBUTES -->
     <string name="fuel_petrol">Petrol</string>
     <string name="fuel_diesel">Diesel</string>
+    <string name="fuel_electric">Electric</string>
+    <string name="fuel_hybrid">Hybrid</string>
+
     <string name="transmission_auto">Automatic</string>
     <string name="transmission_manual">Manual</string>
 
-    <!-- Car Details -->
-    <string name="car_name">Car Name</string>
-    <string name="car_description">Description here</string>
-    <string name="features">Features</string>
+    <!-- FORMATTING (FIXED) -->
+    <string name="price_per_km">€%1$.2f / km</string>
+    <string name="price_simple">€%1$.2f</string>
+    <string name="distance_km">%1$.2f km away</string>
+    <string name="distance_unavailable">Distance unavailable</string>
+    <string name="seats_available">%1$d seats available</string>
+    <string name="car_meta">%1$s - %2$.1f</string>
+    <string name="car_specs">%1$s - %2$s - %3$s</string>
+    <string name="rating_format">%1$.1f</string>
 
-    <!-- Formatted Features -->
-    <string name="car_features">
-        Seats: %1$d\nFuel: %2$s\nTransmission: %3$s
-    </string>
+    <!-- TRIP -->
+    <string name="route_format">%1$s to %2$s</string>
+    <string name="history_completed">%1$s - %2$.2f</string>
+    <string name="history_active">%1$s - %2$.2f/km</string>
 
-    <string name="seats">Seats</string>
-    <string name="fuel">Fuel</string>
-    <string name="transmission">Transmission</string>
+    <!-- STATUS -->
+    <string name="status_available">Available</string>
+    <string name="status_in_progress">In progress</string>
+    <string name="status_completed">Completed</string>
 
-    <!-- Defaults -->
-    <string name="unknown_car">Unknown Car</string>
-    <string name="default_description">This is a comfortable and reliable car available for sharing.</string>
+    <!-- API -->
+    <string name="google_maps_key">AIzaSyA5JZ3w_M9F62uOy02zE4VM_GkdnItO1es</string>
 
-    <!-- Accessibility -->
-    <string name="car_image">Car image</string>
-
-    <!-- Buttons -->
-    <string name="book_now">Book Now</string>
-    <string name="done">Done</string>
-    <string name="back_to_map">Back to Map</string>
-
-    <!-- Booking -->
-    <string name="booking_success">Booking completed successfully</string>
-
-    <string name="booking_message">
-        %1$s\n\nCar: %2$s\nPrice: %3$s
-    </string>
-
-    <!-- ===================== -->
-    <!-- Trip / Ride Sharing -->
-    <!-- ===================== -->
-
-    <string name="trip_created">Trip created successfully!</string>
-    <string name="trip_joined">Joined trip!</string>
-    <string name="no_trips">No available trips to join.</string>
-
-    <!-- Trip Info Labels -->
-    <string name="car_label">Car: %1$s</string>
-    <string name="seats_label">Seats: %1$d</string>
-    <string name="seats_left">Seats left: %1$d</string>
-
-    <string name="select_role">Select role</string>
-    <string name="login_driver">Login as Driver</string>
-    <string name="login_passenger">Login as Passenger</string>
 
 </resources>

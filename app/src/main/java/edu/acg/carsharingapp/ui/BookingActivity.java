@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.database.*;
 
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class BookingActivity extends BaseActivity {
     private TextView txtFuel, txtTransmission, txtCategory;
 
     private MaterialButton btnJoin;
+    private CheckBox checkTerms;
     private ImageView imgCar;
 
     private DatabaseReference tripRef;
@@ -35,7 +37,7 @@ public class BookingActivity extends BaseActivity {
     private SharedPreferences prefs;
 
     private LatLng userLocation;
-    private LatLng carLocation; // ✅ FIXED (moved to class level)
+    private LatLng carLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +55,17 @@ public class BookingActivity extends BaseActivity {
         double carLng = getIntent().getDoubleExtra("carLng", 0);
 
         if (carLat != 0 && carLng != 0) {
-            carLocation = new LatLng(carLat, carLng); // ✅ FIXED
+            carLocation = new LatLng(carLat, carLng);
         }
 
         if (userLat != 0 && userLng != 0) {
-            userLocation = new LatLng(userLat, userLng); // ✅ FIXED (only once)
+            userLocation = new LatLng(userLat, userLng);
         }
 
         tripId = getIntent().getStringExtra("tripId");
 
         if (tripId == null || userId == null) {
-            Toast.makeText(this, "Error loading trip", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_loading_trip), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -76,8 +78,12 @@ public class BookingActivity extends BaseActivity {
     }
 
     private void setupToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(getString(R.string.app_name));
         }
     }
 
@@ -94,6 +100,15 @@ public class BookingActivity extends BaseActivity {
 
         btnJoin = findViewById(R.id.btnJoin);
         imgCar = findViewById(R.id.imgCar);
+        checkTerms = findViewById(R.id.checkTerms);
+
+        // 🔥 disable button until checkbox is checked
+        btnJoin.setEnabled(false);
+
+        checkTerms.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            btnJoin.setEnabled(isChecked);
+        });
+
         findViewById(R.id.txtRoute).setVisibility(View.GONE);
         findViewById(R.id.txtTime).setVisibility(View.GONE);
     }
@@ -116,28 +131,22 @@ public class BookingActivity extends BaseActivity {
                 Car car = CarCatalog.getCarByName(trip.getCarName());
                 bindCarUI(car);
 
-                txtSeats.setText(trip.getAvailableSeats() + " seats available");
-                double pricePerKm = trip.getPrice();
-                txtPrice.setText(String.format("€%.2f / km", pricePerKm));
-                txtStatus.setText(trip.getStatus());
+                txtSeats.setText(getString(R.string.seats_available, trip.getAvailableSeats()));
+                txtPrice.setText(getString(R.string.price_per_km, trip.getPrice()));
+                txtStatus.setText(getStatusText(trip.getStatus()));
 
                 if (userLocation != null) {
 
-                    LatLng carLoc;
-
-                    if (carLocation != null) {
-                        carLoc = carLocation; // ✅ FIXED
-                    } else {
-                        carLoc = new LatLng(
-                                trip.getCurrentLat(),
-                                trip.getCurrentLng()
-                        );
-                    }
+                    LatLng carLoc = (carLocation != null)
+                            ? carLocation
+                            : new LatLng(trip.getCurrentLat(), trip.getCurrentLng());
 
                     float distance = Math.round(getDistanceKm(userLocation, carLoc) * 10) / 10f;
-                    txtDistance.setText(String.format("📏 %.2f km away", distance));
+
+                    txtDistance.setText(getString(R.string.distance_km, distance));
+
                 } else {
-                    txtDistance.setText("Distance unavailable");
+                    txtDistance.setText(getString(R.string.distance_unavailable));
                 }
 
                 handleRoleUI(trip);
@@ -149,20 +158,38 @@ public class BookingActivity extends BaseActivity {
     }
 
     private void bindCarUI(Car car) {
-        if (car != null) {
-            txtCar.setText(car.getDisplayName());
-            txtFuel.setText(car.getFuelType());
-            txtTransmission.setText(car.getTransmission());
-            txtCategory.setText(car.getCategory() + " • ⭐ " + car.getRating());
-            imgCar.setImageResource(car.getImageResId());
+
+        if (car == null) return;
+
+        txtCar.setText(car.getDisplayName());
+        txtFuel.setText(getString(car.getFuelTypeResId()));
+        txtTransmission.setText(getString(car.getTransmissionResId()));
+
+        txtCategory.setText(
+                getString(R.string.car_meta,
+                        car.getCategory(),
+                        car.getRating())
+        );
+
+        imgCar.setImageResource(car.getImageResId());
+    }
+
+    private String getStatusText(String status) {
+
+        if (Trip.STATUS_AVAILABLE.equals(status)) {
+            return getString(R.string.status_available);
+        } else if (Trip.STATUS_IN_PROGRESS.equals(status)) {
+            return getString(R.string.status_in_progress);
+        } else if (Trip.STATUS_COMPLETED.equals(status)) {
+            return getString(R.string.status_completed);
         }
+
+        return status;
     }
 
     private void handleRoleUI(Trip trip) {
 
-        boolean isDriver = "DRIVER".equals(role);
-
-        if (isDriver) {
+        if ("DRIVER".equals(role)) {
             handleDriver(trip);
         } else {
             handlePassenger(trip);
@@ -177,9 +204,16 @@ public class BookingActivity extends BaseActivity {
         }
 
         btnJoin.setVisibility(View.VISIBLE);
-        btnJoin.setText("Start Ride");
+        btnJoin.setText(getString(R.string.start_ride));
 
         btnJoin.setOnClickListener(v -> {
+
+            if (!checkTerms.isChecked()) {
+                Toast.makeText(this,
+                        getString(R.string.accept_terms_first),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             Map<String, Object> updates = new HashMap<>();
             updates.put("driverId", userId);
@@ -188,6 +222,7 @@ public class BookingActivity extends BaseActivity {
                 updates.put("currentLat", carLocation.latitude);
                 updates.put("currentLng", carLocation.longitude);
             }
+
             tripRef.updateChildren(updates).addOnSuccessListener(unused -> {
 
                 prefs.edit()
@@ -195,7 +230,7 @@ public class BookingActivity extends BaseActivity {
                         .putBoolean("pickingDestination", true)
                         .apply();
 
-                Toast.makeText(this, "Select destination on map", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.select_destination), Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(BookingActivity.this, MapActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -214,9 +249,7 @@ public class BookingActivity extends BaseActivity {
 
         btnJoin.setVisibility(View.VISIBLE);
 
-        boolean alreadyJoined = trip.hasPassenger(userId);
-
-        if (alreadyJoined) {
+        if (trip.hasPassenger(userId)) {
             setupLeave();
         } else {
             setupJoin(trip);
@@ -226,15 +259,21 @@ public class BookingActivity extends BaseActivity {
     private void setupJoin(Trip trip) {
 
         if (trip.getAvailableSeats() <= 0) {
-            btnJoin.setText("Full");
+            btnJoin.setText(getString(R.string.ride_full));
             btnJoin.setEnabled(false);
             return;
         }
 
-        btnJoin.setText("Join Ride");
-        btnJoin.setEnabled(true);
+        btnJoin.setText(getString(R.string.join_ride));
 
         btnJoin.setOnClickListener(v -> {
+
+            if (!checkTerms.isChecked()) {
+                Toast.makeText(this,
+                        getString(R.string.accept_terms_first),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             tripRef.runTransaction(new Transaction.Handler() {
                 @NonNull
@@ -263,7 +302,9 @@ public class BookingActivity extends BaseActivity {
 
                     if (committed) {
                         prefs.edit().putString("activeTripId", tripId).apply();
-                        Toast.makeText(BookingActivity.this, "Joined ride!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BookingActivity.this,
+                                getString(R.string.joined_ride),
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -272,7 +313,7 @@ public class BookingActivity extends BaseActivity {
 
     private void setupLeave() {
 
-        btnJoin.setText("Leave Ride");
+        btnJoin.setText(getString(R.string.leave_ride));
 
         btnJoin.setOnClickListener(v -> {
 
@@ -299,7 +340,9 @@ public class BookingActivity extends BaseActivity {
 
                     if (committed) {
                         prefs.edit().remove("activeTripId").apply();
-                        Toast.makeText(BookingActivity.this, "Left ride", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BookingActivity.this,
+                                getString(R.string.left_ride),
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -307,6 +350,7 @@ public class BookingActivity extends BaseActivity {
     }
 
     private float getDistanceKm(LatLng a, LatLng b) {
+
         float[] results = new float[1];
 
         android.location.Location.distanceBetween(

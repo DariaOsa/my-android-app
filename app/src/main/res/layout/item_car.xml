@@ -22,7 +22,7 @@
         android:id="@+id/txtCarName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="BMW 3 Series"
+        android:text=""
         android:textSize="16sp"
         android:textStyle="bold"
         android:paddingTop="8dp" />
@@ -32,7 +32,7 @@
         android:id="@+id/txtMeta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Premium • ⭐ 4.6"
+        android:text=""
         android:textSize="12sp"
         android:textColor="#777" />
 
@@ -41,7 +41,7 @@
         android:id="@+id/txtSpecs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5 seats • Electric • Automatic"
+        android:text=""
         android:textSize="12sp" />
 
     <!-- 💶 PRICE -->
@@ -49,7 +49,7 @@
         android:id="@+id/txtPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="€12.00 / trip"
+        android:text=""
         android:textSize="16sp"
         android:textStyle="bold"
         android:paddingTop="6dp" />
@@ -59,7 +59,7 @@
         android:id="@+id/txtDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📏 2.1 km away"
+        android:text=""
         android:textSize="12sp"
         android:textColor="#777" />
 
@@ -68,7 +68,7 @@
         android:id="@+id/txtStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="READY"
+        android:text=""
         android:textColor="#4CAF50"
         android:textStyle="bold"
         android:paddingTop="4dp" />

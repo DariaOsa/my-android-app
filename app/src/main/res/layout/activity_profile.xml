@@ -1,49 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <!-- 👤 NAME -->
-    <TextView
-        android:id="@+id/txtName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="John Doe"
-        android:textSize="20sp"
-        android:textStyle="bold"/>
+    <!-- 🔝 TOOLBAR -->
+    <include layout="@layout/toolbar"/>
 
-    <!-- 📧 EMAIL -->
-    <TextView
-        android:id="@+id/txtEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="email@example.com"
-        android:textColor="#757575"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- 🧾 TITLE -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ride History"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
-    <!-- 🚗 HISTORY LIST -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerHistory"
+    <!-- 👤 CONTENT -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- 🚪 LOGOUT -->
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Logout"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/btn_danger"/>
+        <!-- 👤 NAME -->
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_name"
+            android:textColor="#666"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- 📧 EMAIL -->
+        <TextView
+            android:id="@+id/txtEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_email"
+            android:textColor="#666"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 📜 TITLE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ride_history"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- 🚗 HISTORY LIST -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerHistory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- ⚙️ PREFERENCE -->
+        <CheckBox
+            android:id="@+id/checkDarkMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dark_mode"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- 🚪 LOGOUT -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/logout"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_danger"/>
+
+    </LinearLayout>
+
 </LinearLayout>

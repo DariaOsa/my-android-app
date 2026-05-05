@@ -6,43 +6,23 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <!-- 🔝 TOOLBAR  -->
+    <include layout="@layout/toolbar"/>
+
+    <Spinner
+        android:id="@+id/spinnerSort"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center">
+        android:layout_height="48dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/spinner_ripple"
+        android:padding="8dp"
+        android:spinnerMode="dropdown"/>
 
-        <Button
-            android:id="@+id/btnSortDistance"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Distance"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:background="@drawable/bg_sort_button"
-            android:textColor="@color/black"
-            android:layout_marginEnd="6dp"/>
-
-        <Button
-            android:id="@+id/btnSortPrice"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Price"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:background="@drawable/bg_sort_button"
-            android:textColor="@color/black"
-            android:layout_marginStart="6dp"/>
-
-    </LinearLayout>
-
+    <!-- 🚗 CAR LIST -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerCars"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/car_list" />
+        android:contentDescription="@string/car_list_desc" />
 
 </LinearLayout>

@@ -5,21 +5,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="?attr/colorSurface">
 
-    <!-- 🚗 IMAGE (clean + tighter) -->
+    <!-- 🧭 TOOLBAR -->
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 🚗 IMAGE -->
     <ImageView
         android:id="@+id/imgCar"
         android:layout_width="0dp"
         android:layout_height="180dp"
         android:layout_margin="16dp"
         android:scaleType="centerCrop"
-        android:background="#FFFFFF"
+        android:background="?attr/colorSurface"
         android:clipToOutline="true"
-        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/car1"
+        android:contentDescription="@string/car_image"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/car1"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- 🚗 MAIN CARD -->
     <com.google.android.material.card.MaterialCardView
@@ -31,9 +42,9 @@
         android:layout_marginBottom="8dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="#FFFFFF"
+        app:cardBackgroundColor="?attr/colorSurface"
         app:layout_constraintTop_toBottomOf="@id/imgCar"
-        app:layout_constraintBottom_toTopOf="@id/btnJoin"
+        app:layout_constraintBottom_toTopOf="@id/checkTerms"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -52,19 +63,18 @@
                     android:id="@+id/txtCar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Audi A4"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#111"/>
+                    android:textColor="?attr/colorOnSurface"/>
 
                 <!-- ⭐ CATEGORY -->
                 <TextView
                     android:id="@+id/txtCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Comfort • ⭐ 4.5"
                     android:textSize="14sp"
-                    android:textColor="#666"
+                    android:textColor="?attr/colorOnSurface"
+                    android:alpha="0.7"
                     android:layout_marginTop="4dp"/>
 
                 <!-- 📊 INFO -->
@@ -72,8 +82,7 @@
                     android:id="@+id/txtSeats"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="👥 5 seats available"
-                    android:textColor="#444"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp"
                     android:layout_marginTop="12dp"/>
 
@@ -81,8 +90,7 @@
                     android:id="@+id/txtFuel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⛽ Petrol"
-                    android:textColor="#444"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
 
@@ -90,8 +98,7 @@
                     android:id="@+id/txtTransmission"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚙️ Automatic"
-                    android:textColor="#444"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
 
@@ -100,9 +107,9 @@
                     android:id="@+id/txtRoute"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📍 Route"
                     android:textSize="14sp"
-                    android:textColor="#555"
+                    android:textColor="?attr/colorOnSurface"
+                    android:alpha="0.7"
                     android:layout_marginTop="16dp"/>
 
                 <!-- ⏰ TIME -->
@@ -110,49 +117,40 @@
                     android:id="@+id/txtTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⏰ Time"
                     android:textSize="13sp"
-                    android:textColor="#777"
+                    android:textColor="?attr/colorOnSurface"
+                    android:alpha="0.6"
                     android:layout_marginTop="4dp"/>
 
                 <!-- 💰 PRICE -->
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Price"
-                    android:textColor="#888"
-                    android:textSize="12sp"
-                    android:layout_marginTop="20dp"/>
-
-                <TextView
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="€11.00 / trip"
                     android:textSize="22sp"
                     android:textStyle="bold"
-                    android:textColor="#111"
+                    android:textColor="?attr/colorOnSurface"
                     android:layout_marginTop="2dp"/>
 
+                <!-- 📏 DISTANCE -->
                 <TextView
                     android:id="@+id/txtDistance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Distance: -- km"
                     android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurface"
                     android:layout_marginTop="8dp"/>
+
                 <!-- 🟢 STATUS -->
                 <TextView
                     android:id="@+id/txtStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="READY"
                     android:textStyle="bold"
                     android:textSize="14sp"
-                    android:textColor="#2ECC71"
+                    android:textColor="?attr/colorPrimary"
                     android:layout_marginTop="12dp"/>
 
-                <!-- spacing -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="24dp"/>
@@ -163,18 +161,31 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- ✅ CHECKBOX -->
+    <CheckBox
+        android:id="@+id/checkTerms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/agree_terms"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="14sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/btnJoin"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <!-- 🔘 BUTTON -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnJoin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Start Ride"
+        android:text="@string/start_ride"
         android:textAllCaps="false"
         android:textSize="17sp"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/colorOnPrimary"
         app:cornerRadius="28dp"
-        app:backgroundTint="#111111"
+        app:backgroundTint="?attr/colorPrimary"
         android:elevation="6dp"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
